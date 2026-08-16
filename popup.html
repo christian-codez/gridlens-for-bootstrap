@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bootstrap Toolkit</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🛠️ Bootstrap Toolkit</h1>
+      <p class="subtitle">Grid • Tooltips • Modals</p>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="grid">
+        <span class="tab-icon">📐</span>
+        <span class="tab-text">Grid</span>
+      </button>
+      <button class="tab-btn" data-tab="tooltips">
+        <span class="tab-icon">💬</span>
+        <span class="tab-text">Tooltips</span>
+      </button>
+      <button class="tab-btn" data-tab="modals">
+        <span class="tab-icon">🗔</span>
+        <span class="tab-text">Modals</span>
+      </button>
+    </nav>
+
+    <!-- Grid Panel -->
+    <section id="grid-panel" class="panel active">
+      <div class="panel-content">
+        <div class="toggle-section">
+          <button id="toggleGrid" class="btn-toggle">
+            <span id="toggleGridIcon">◻</span>
+            <span id="toggleGridText">Show Grid</span>
+          </button>
+        </div>
+
+        <div class="breakpoint-display">
+          <div class="label">Current Breakpoint:</div>
+          <div class="breakpoint-info">
+            <span id="bp-name" class="bp-name">--</span>
+            <span id="bp-width" class="bp-width">0px</span>
+          </div>
+        </div>
+
+        <div class="responsive-preview-section" style="margin-bottom:16px;">
+          <h3 style="font-size:14px;color:#333;margin-bottom:8px;">Responsive Preview</h3>
+          <div class="responsive-buttons" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="responsive-btn" data-width="375" data-label="xs">XS</button>
+            <button class="responsive-btn" data-width="576" data-label="sm">SM</button>
+            <button class="responsive-btn" data-width="768" data-label="md">MD</button>
+            <button class="responsive-btn" data-width="992" data-label="lg">LG</button>
+            <button class="responsive-btn" data-width="1200" data-label="xl">XL</button>
+            <button class="responsive-btn" data-width="1400" data-label="xxl">XXL</button>
+          </div>
+          <div class="responsive-note" style="font-size:11px;color:#888;margin-top:4px;">Resize the page to Bootstrap breakpoints</div>
+        </div>
+
+        <div class="settings-section">
+          <h3>Grid Color</h3>
+          <div class="color-picker-group">
+            <label for="gridColor">Overlay Color:</label>
+            <input type="color" id="gridColor" value="#ff0000">
+            <button id="resetColor" class="btn-small">Reset</button>
+          </div>
+        </div>
+
+        <div class="collapsible-section">
+          <button class="collapsible-header" data-target="breakpoints-section">
+            <span>Custom Breakpoints</span>
+            <span class="collapse-icon">▼</span>
+          </button>
+          <div id="breakpoints-section" class="collapsible-content">
+            <p class="help-text">Add custom breakpoints or use Bootstrap defaults.</p>
+            <div id="breakpointsList" class="breakpoints-list"></div>
+            <button id="addBreakpoint" class="btn-add">+ Add Breakpoint</button>
+            <div class="button-group">
+              <button id="saveBreakpoints" class="btn-primary-small">Save</button>
+              <button id="resetBreakpoints" class="btn-secondary-small">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tooltips Panel -->
+    <section id="tooltips-panel" class="panel">
+      <div class="panel-content">
+        <div class="settings-row">
+          <label for="version-select" class="setting-label">Bootstrap Version:</label>
+          <select id="version-select" class="version-select">
+            <option value="auto">Auto-detect</option>
+            <option value="5">Bootstrap 5</option>
+            <option value="4">Bootstrap 4</option>
+            <option value="3">Bootstrap 3</option>
+            <option value="0">No Bootstrap (Custom)</option>
+          </select>
+        </div>
+
+        <div class="status-box">
+          <div class="status-item">
+            <span class="label">Tooltips found:</span>
+            <span id="tooltip-count" class="value">-</span>
+          </div>
+          <div class="status-item">
+            <span class="label">Detected version:</span>
+            <span id="bootstrap-version" class="value">-</span>
+          </div>
+          <div class="status-item">
+            <span class="label">Status:</span>
+            <span id="tooltip-status" class="value">Hidden</span>
+          </div>
+        </div>
+
+        <button id="toggleTooltips" class="btn-toggle">
+          <span id="toggleTooltipsIcon">👁️</span>
+          <span id="toggleTooltipsText">Show All Tooltips</span>
+        </button>
+
+        <div class="info-box">
+          <p>💡 Click the button to toggle all Bootstrap tooltips on the current page.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modals Panel -->
+    <section id="modals-panel" class="panel">
+      <div class="panel-content">
+        <div class="modal-select-section">
+          <label for="modal-select" class="setting-label">Select a Modal:</label>
+          <select id="modal-select" class="modal-select">
+            <option value="">-- Scanning for modals... --</option>
+          </select>
+        </div>
+
+        <button id="openModal" class="btn-toggle">
+          <span>🗔</span>
+          <span>Open Selected Modal</span>
+        </button>
+
+        <div class="status-box">
+          <div class="status-item">
+            <span class="label">Modals found:</span>
+            <span id="modal-count" class="value">-</span>
+          </div>
+          <div class="status-item">
+            <span class="label">Bootstrap version:</span>
+            <span id="modal-bs-version" class="value">-</span>
+          </div>
+        </div>
+
+        <button id="refreshModals" class="btn-secondary-small btn-full">
+          🔄 Refresh Modal List
+        </button>
+
+        <div class="info-box">
+          <p>💡 Select a modal from the dropdown and click "Open" to display it.</p>
+          <p class="note">Works with Bootstrap 3, 4, and 5 modals!</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Bootstrap Toolkit v1.0.0</p>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

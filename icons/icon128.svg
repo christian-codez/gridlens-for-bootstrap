@@ -1,0 +1,28 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="url(#grad1)"/>
+  
+  <!-- Tooltip icon - speech bubble with "i" -->
+  <g transform="translate(64, 64)">
+    <!-- Speech bubble -->
+    <path d="M -30 -20 L 30 -20 Q 35 -20 35 -15 L 35 15 Q 35 20 30 20 L 5 20 L 0 30 L -5 20 L -30 20 Q -35 20 -35 15 L -35 -15 Q -35 -20 -30 -20 Z" 
+          fill="white" 
+          stroke="none"/>
+    
+    <!-- Letter "i" in tooltip -->
+    <circle cx="0" cy="-8" r="3.5" fill="url(#grad1)"/>
+    <rect x="-2.5" y="-2" width="5" height="14" rx="2" fill="url(#grad1)"/>
+  </g>
+  
+  <!-- Decorative dots around (representing multiple tooltips) -->
+  <circle cx="25" cy="35" r="4" fill="white" opacity="0.8"/>
+  <circle cx="103" cy="35" r="4" fill="white" opacity="0.8"/>
+  <circle cx="25" cy="93" r="4" fill="white" opacity="0.8"/>
+</svg>
