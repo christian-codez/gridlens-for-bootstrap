@@ -402,12 +402,12 @@ function updateTooltipStatus() {
     
     if (response.visible) {
       statusEl.textContent = 'Visible';
-      statusEl.style.color = '#22c55e';
+      statusEl.classList.add('is-on');
       text.textContent = 'Hide All Tooltips';
       btn.classList.add('active');
     } else {
       statusEl.textContent = 'Hidden';
-      statusEl.style.color = '#94a3b8';
+      statusEl.classList.remove('is-on');
       text.textContent = 'Show All Tooltips';
       btn.classList.remove('active');
     }

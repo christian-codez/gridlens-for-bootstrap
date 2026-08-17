@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!--
+    GridLens toolbar mark - master artwork. icons/*.png are rendered from this;
+    see the "Icons" section of README.md for the command.
+
+    Three grid columns, the centre one taller. Designed at 16px first: a lens
+    ring plus columns turned to mush at toolbar size, and a plain magnifier is
+    the most generic mark there is - indistinguishable from a dozen other
+    extensions in the same toolbar. Columns stay crisp at every size, are
+    distinctive in a toolbar, and echo the Grid tab icon inside the popup, so
+    the mark and the UI read as one family.
+
+    Teal (#12837f -> #06504d) is the GridLens accent. Deliberately not
+    Bootstrap's brand purple: this is an unaffiliated project.
+  -->
+  <defs>
+    <linearGradient id="gridlens-tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12837f"/>
+      <stop offset="1" stop-color="#06504d"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="url(#gridlens-tile)"/>
+
+  <g fill="#ffffff">
+    <rect x="26" y="38" width="20" height="52" rx="6"/>
+    <rect x="54" y="24" width="20" height="80" rx="6"/>
+    <rect x="82" y="38" width="20" height="52" rx="6"/>
+  </g>
+</svg>

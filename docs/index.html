@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GridLens for Bootstrap</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="description" content="A browser extension for building and debugging Bootstrap layouts: pixel-accurate grid overlay, live breakpoint readout, tooltip viewer, and modal opener.">
 <style>
   :root {
@@ -31,6 +32,7 @@
   main { max-width: 47rem; margin: 0 auto; }
 
   header { padding: 64px 0 30px; border-bottom: 2px solid var(--ink); }
+  .mark { display: block; margin-bottom: 18px; border-radius: 12px; }
   .eyebrow {
     font: 700 11px/1.4 var(--font-mono); letter-spacing: .14em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
@@ -116,6 +118,7 @@
 <main>
 
 <header>
+  <svg class="mark" viewBox="0 0 128 128" width="52" height="52" aria-hidden="true"><defs><linearGradient id="glt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#12837f"/><stop offset="1" stop-color="#06504d"/></linearGradient></defs><rect width="128" height="128" rx="28" fill="url(#glt)"/><g fill="#fff"><rect x="26" y="38" width="20" height="52" rx="6"/><rect x="54" y="24" width="20" height="80" rx="6"/><rect x="82" y="38" width="20" height="52" rx="6"/></g></svg>
   <div class="eyebrow">Browser extension · Chrome &amp; Firefox</div>
   <h1>GridLens for Bootstrap</h1>
   <p class="standfirst">Overlay the real Bootstrap grid, watch the breakpoint change as you resize, reveal every tooltip at once, and open any modal — including the ones with no trigger button.</p>

@@ -1,5 +1,43 @@
 /* GridLens for Bootstrap - Popup Styles */
 
+/* Palette
+   ------------------------------------------------------------------
+   One source of truth for the identity. The popup previously mixed an
+   indigo-purple inherited from the original Bootstrap Toolkit with the teal
+   introduced when the extension was renamed, so the header and buttons
+   disagreed with the toolbar badge, the container-type switch and the
+   project's own website. Everything now derives from these tokens.
+
+   Teal is deliberately not Bootstrap's brand purple - this is an
+   unaffiliated project and should not borrow their palette. */
+:root {
+  --gl-accent: #0b6e6b;
+  --gl-accent-strong: #08504e;
+  --gl-accent-bright: #12837f;
+  --gl-accent-deep: #043c3a;
+  --gl-accent-soft: #dceae8;
+  --gl-accent-tint: #eef4f3;
+  --gl-gradient: linear-gradient(135deg, #12837f 0%, #06504d 100%);
+
+  --gl-ink: #101e1c;
+  --gl-ink-2: #354744;
+  --gl-muted: #61736f;
+  --gl-faint: #8c9c99;
+
+  --gl-surface: #ffffff;
+  --gl-surface-2: #f2f5f4;
+  --gl-surface-3: #e8eeed;
+  --gl-rule: #d3ddda;
+  --gl-rule-soft: #e3eae8;
+
+  --gl-ok: #2f7d55;
+  --gl-danger: #b3392f;
+  --gl-danger-strong: #8f2c24;
+  --gl-note-bg: #fdf6e6;
+  --gl-note-border: #d8a72e;
+  --gl-note-ink: #6b4d0d;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -9,8 +47,8 @@
 body {
   width: 380px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #333;
+  background: var(--gl-gradient);
+  color: var(--gl-ink);
 }
 
 .container {
@@ -22,7 +60,7 @@ body {
 
 /* Header */
 header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gl-gradient);
   padding: 16px 20px;
   text-align: center;
   color: white;
@@ -45,8 +83,8 @@ header h1 {
 /* Tabs */
 .tabs {
   display: flex;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
+  background: var(--gl-surface-2);
+  border-bottom: 1px solid var(--gl-rule);
 }
 
 .tab-btn {
@@ -64,32 +102,32 @@ header h1 {
 }
 
 .tab-btn:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: var(--gl-accent-tint);
 }
 
 .tab-btn.active {
   background: white;
-  border-bottom-color: #667eea;
+  border-bottom-color: var(--gl-accent);
 }
 
 .tab-icon {
   font-size: 19px;
-  color: #94a3b8;
+  color: var(--gl-faint);
   transition: color .2s;
 }
 
 .tab-btn.active .tab-icon {
-  color: #667eea;
+  color: var(--gl-accent);
 }
 
 .tab-text {
   font-size: 11px;
   font-weight: 600;
-  color: #666;
+  color: var(--gl-ink-2);
 }
 
 .tab-btn.active .tab-text {
-  color: #667eea;
+  color: var(--gl-accent);
 }
 
 /* Panels */
@@ -111,7 +149,7 @@ header h1 {
 .btn-toggle {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gl-gradient);
   color: white;
   border: none;
   border-radius: 8px;
@@ -128,7 +166,7 @@ header h1 {
 
 .btn-toggle:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(11, 110, 107, 0.28);
 }
 
 .btn-toggle:active {
@@ -136,21 +174,21 @@ header h1 {
 }
 
 .btn-toggle.active {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, var(--gl-accent-strong) 0%, var(--gl-accent-deep) 100%);
 }
 
 /* Breakpoint Display */
 .breakpoint-display {
-  background: #f5f5f5;
+  background: var(--gl-surface-2);
   padding: 14px;
   border-radius: 8px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--gl-accent);
   margin-bottom: 16px;
 }
 
 .label {
   font-size: 12px;
-  color: #666;
+  color: var(--gl-ink-2);
   margin-bottom: 6px;
   font-weight: 500;
 }
@@ -164,14 +202,14 @@ header h1 {
 .bp-name {
   font-size: 22px;
   font-weight: bold;
-  color: #667eea;
+  color: var(--gl-accent);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
 .bp-width {
   font-size: 16px;
-  color: #00d4aa;
+  color: var(--gl-accent);
   font-family: 'Courier New', monospace;
 }
 
@@ -182,7 +220,7 @@ header h1 {
 
 .settings-section h3 {
   font-size: 14px;
-  color: #333;
+  color: var(--gl-ink);
   margin-bottom: 10px;
 }
 
@@ -191,27 +229,27 @@ header h1 {
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background: #f9f9f9;
+  background: var(--gl-surface-2);
   border-radius: 6px;
 }
 
 .color-picker-group label {
   font-size: 13px;
   font-weight: 500;
-  color: #333;
+  color: var(--gl-ink);
 }
 
 .color-picker-group input[type="color"] {
   width: 50px;
   height: 32px;
-  border: 2px solid #ddd;
+  border: 2px solid var(--gl-rule);
   border-radius: 4px;
   cursor: pointer;
 }
 
 /* Collapsible Sections */
 .collapsible-section {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--gl-rule);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -219,7 +257,7 @@ header h1 {
 .collapsible-header {
   width: 100%;
   padding: 12px 14px;
-  background: #f9f9f9;
+  background: var(--gl-surface-2);
   border: none;
   cursor: pointer;
   display: flex;
@@ -227,17 +265,17 @@ header h1 {
   align-items: center;
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--gl-ink);
 }
 
 .collapsible-header:hover {
-  background: #f0f0f0;
+  background: var(--gl-surface-3);
 }
 
 .collapse-icon {
   transition: transform 0.2s;
   font-size: 15px;
-  color: #94a3b8;
+  color: var(--gl-faint);
 }
 
 .collapsible-header.expanded .collapse-icon {
@@ -257,7 +295,7 @@ header h1 {
 /* Help Text */
 .help-text {
   font-size: 12px;
-  color: #666;
+  color: var(--gl-ink-2);
   margin-bottom: 12px;
 }
 
@@ -267,11 +305,11 @@ header h1 {
 }
 
 .breakpoint-item {
-  background: #f9f9f9;
+  background: var(--gl-surface-2);
   padding: 10px;
   border-radius: 6px;
   margin-bottom: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--gl-rule);
 }
 
 .breakpoint-inputs {
@@ -283,7 +321,7 @@ header h1 {
 
 .breakpoint-inputs input {
   padding: 6px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--gl-rule);
   border-radius: 4px;
   font-size: 12px;
   width: 100%;
@@ -291,15 +329,15 @@ header h1 {
 
 .breakpoint-inputs input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--gl-accent);
 }
 
 /* Buttons */
 .btn-small {
   padding: 6px 12px;
-  background: #f5f5f5;
-  color: #666;
-  border: 1px solid #ddd;
+  background: var(--gl-surface-2);
+  color: var(--gl-ink-2);
+  border: 1px solid var(--gl-rule);
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
@@ -307,12 +345,26 @@ header h1 {
 }
 
 .btn-small:hover {
-  background: #e0e0e0;
+  background: var(--gl-rule);
 }
 
-/* Responsive Preview */
+/* Responsive Preview
+   These rules were inline in popup.html with hardcoded greys, which bypassed
+   the palette entirely. */
 .responsive-preview-section {
   margin-bottom: 16px;
+}
+
+.responsive-preview-section h3 {
+  font-size: 14px;
+  color: var(--gl-ink);
+  margin-bottom: 8px;
+}
+
+.responsive-note {
+  font-size: 11px;
+  color: var(--gl-muted);
+  margin-top: 4px;
 }
 .responsive-buttons {
   display: flex;
@@ -322,9 +374,9 @@ header h1 {
 .responsive-btn {
   flex: none;
   padding: 7px 12px;
-  background: #e0e7ef;
-  color: #667eea;
-  border: 1px solid #667eea;
+  background: var(--gl-accent-soft);
+  color: var(--gl-accent);
+  border: 1px solid var(--gl-accent);
   border-radius: 5px;
   font-size: 12px;
   font-weight: 600;
@@ -332,16 +384,16 @@ header h1 {
   transition: background 0.2s, color 0.2s;
 }
 .responsive-btn:hover {
-  background: #667eea;
-  color: #fff;
+  background: var(--gl-accent);
+  color: var(--gl-surface);
 }
 
 .btn-add {
   width: 100%;
   padding: 10px;
-  background: #f5f5f5;
-  color: #667eea;
-  border: 2px dashed #667eea;
+  background: var(--gl-surface-2);
+  color: var(--gl-accent);
+  border: 2px dashed var(--gl-accent);
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
@@ -351,7 +403,7 @@ header h1 {
 }
 
 .btn-add:hover {
-  background: #667eea;
+  background: var(--gl-accent);
   color: white;
   border-style: solid;
 }
@@ -359,7 +411,7 @@ header h1 {
 .btn-remove {
   width: 100%;
   padding: 6px;
-  background: #ff4757;
+  background: var(--gl-danger);
   color: white;
   border: none;
   border-radius: 4px;
@@ -369,7 +421,7 @@ header h1 {
 }
 
 .btn-remove:hover {
-  background: #ee5a6f;
+  background: var(--gl-danger-strong);
 }
 
 .button-group {
@@ -399,21 +451,21 @@ header h1 {
 }
 
 .btn-primary-small {
-  background: #667eea;
+  background: var(--gl-accent);
   color: white;
 }
 
 .btn-primary-small:hover {
-  background: #5568d3;
+  background: var(--gl-accent-strong);
 }
 
 .btn-secondary-small {
-  background: #e0e0e0;
-  color: #666;
+  background: var(--gl-rule);
+  color: var(--gl-ink-2);
 }
 
 .btn-secondary-small:hover {
-  background: #d0d0d0;
+  background: var(--gl-rule);
 }
 
 .btn-full {
@@ -429,36 +481,36 @@ header h1 {
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: #333;
+  color: var(--gl-ink);
   margin-bottom: 6px;
 }
 
 .version-select, .text-input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--gl-rule);
   border-radius: 6px;
   font-size: 14px;
-  color: #333;
+  color: var(--gl-ink);
   background: white;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .version-select:hover, .text-input:hover {
-  border-color: #667eea;
+  border-color: var(--gl-accent);
 }
 
 .version-select:focus, .text-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--gl-accent);
+  box-shadow: 0 0 0 3px var(--gl-accent-tint);
 }
 
 /* Status Box */
 .status-box {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--gl-surface-2);
+  border: 1px solid var(--gl-rule);
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 14px;
@@ -469,7 +521,7 @@ header h1 {
   justify-content: space-between;
   align-items: center;
   padding: 5px 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--gl-rule);
 }
 
 .status-item:last-child {
@@ -479,22 +531,22 @@ header h1 {
 .value {
   font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: var(--gl-ink);
 }
 
 /* Info Box */
 .info-box {
   margin-top: 14px;
   padding: 12px;
-  background: #fef3c7;
-  border-left: 3px solid #f59e0b;
+  background: var(--gl-note-bg);
+  border-left: 3px solid var(--gl-note-border);
   border-radius: 4px;
 }
 
 .info-box p {
   font-size: 12px;
   line-height: 1.5;
-  color: #92400e;
+  color: var(--gl-note-ink);
   margin-bottom: 5px;
 }
 
@@ -504,7 +556,7 @@ header h1 {
 
 .note {
   font-weight: 600;
-  color: #b45309 !important;
+  color: var(--gl-note-ink) !important;
 }
 
 /* Modal Section */
@@ -515,35 +567,35 @@ header h1 {
 .modal-select {
   width: 100%;
   padding: 12px;
-  border: 2px solid #667eea;
+  border: 2px solid var(--gl-accent);
   border-radius: 8px;
   font-size: 14px;
-  color: #333;
+  color: var(--gl-ink);
   background: white;
   cursor: pointer;
   transition: all 0.2s;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230b6e6b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
 }
 
 .modal-select:hover:not(:disabled) {
-  border-color: #5568d3;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--gl-accent-strong);
+  box-shadow: 0 0 0 3px var(--gl-accent-tint);
 }
 
 .modal-select:focus {
   outline: none;
-  border-color: #5568d3;
+  border-color: var(--gl-accent-strong);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 
 .modal-select:disabled {
-  background-color: #f5f5f5;
-  border-color: #ddd;
-  color: #999;
+  background-color: var(--gl-surface-2);
+  border-color: var(--gl-rule);
+  color: var(--gl-faint);
   cursor: not-allowed;
 }
 
@@ -596,33 +648,38 @@ header h1 {
   font-size: 11px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-weight: 600;
-  color: #64748b;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  color: var(--gl-muted);
+  background: var(--gl-surface-2);
+  border: 1px solid var(--gl-rule);
   border-radius: 6px;
   cursor: pointer;
   transition: background .15s, color .15s, border-color .15s;
 }
 
 .container-type-btn:hover {
-  background: #e2e8f0;
-  color: #475569;
+  background: var(--gl-rule);
+  color: var(--gl-ink-2);
 }
 
 .container-type-btn.active {
-  background: #0b6e6b;
-  border-color: #0b6e6b;
-  color: #fff;
+  background: var(--gl-accent);
+  border-color: var(--gl-accent);
+  color: var(--gl-surface);
 }
 
 .container-type-btn:focus-visible {
-  outline: 2px solid #0b6e6b;
+  outline: 2px solid var(--gl-accent);
   outline-offset: 1px;
 }
 
 #container-hint {
   margin-top: 6px;
 }
+
+/* Tooltip status reads "Visible" or "Hidden"; the state colour lives here
+   rather than being set inline from popup.js, so it follows the palette. */
+#tooltip-status { color: var(--gl-faint); }
+#tooltip-status.is-on { color: var(--gl-ok); }
 
 /* Info box paragraphs lead with an icon, so align it to the first line
    rather than letting it centre against a wrapped block. */
@@ -635,20 +692,20 @@ header h1 {
 .info-box p .icon {
   font-size: 15px;
   margin-top: 1px;
-  color: #94a3b8;
+  color: var(--gl-faint);
 }
 
 /* Footer */
 footer {
-  background: #f8fafc;
+  background: var(--gl-surface-2);
   padding: 10px;
   text-align: center;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--gl-rule);
 }
 
 footer p {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--gl-faint);
   font-weight: 500;
   margin: 0;
 }
@@ -656,7 +713,7 @@ footer p {
 footer .disclaimer {
   font-size: 10px;
   font-weight: 400;
-  color: #a8b4c4;
+  color: var(--gl-faint);
   margin-top: 3px;
 }
 
@@ -666,7 +723,7 @@ footer .disclaimer {
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background: #4caf50;
+  background: var(--gl-ok);
   color: white;
   padding: 10px 20px;
   border-radius: 6px;
@@ -677,7 +734,7 @@ footer .disclaimer {
 }
 
 .status-message.error {
-  background: #f44336;
+  background: var(--gl-danger);
 }
 
 @keyframes fadeIn {
@@ -699,16 +756,16 @@ footer .disclaimer {
 
 .panel::-webkit-scrollbar-track,
 .modals-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--gl-surface-2);
 }
 
 .panel::-webkit-scrollbar-thumb,
 .modals-list::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: var(--gl-rule);
   border-radius: 3px;
 }
 
 .panel::-webkit-scrollbar-thumb:hover,
 .modals-list::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+  background: var(--gl-faint);
 }

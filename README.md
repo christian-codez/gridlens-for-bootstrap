@@ -136,7 +136,25 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.4.1
+1.5.0
+
+## Icons
+
+`icons/icon.svg` is the master artwork. The four PNG sizes the manifest ships
+are rendered from it:
+
+```sh
+./icons/build-icons.sh
+```
+
+The mark is three grid columns in GridLens teal, designed at 16px first — a lens
+ring turned to mush at toolbar size, and a plain magnifier is indistinguishable
+from a dozen other extensions in the same toolbar. The columns echo the Grid tab
+icon in the popup, so the mark and the UI read as one family.
+
+The popup palette is defined once as CSS custom properties at the top of
+`popup.css`. Add colours there rather than inline, or the identity drifts —
+which is how the extension ended up half indigo and half teal after the rename.
 
 ## Packaging
 

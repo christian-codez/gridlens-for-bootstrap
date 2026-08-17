@@ -70,7 +70,9 @@
   border-right: 2px solid rgba(255, 0, 0, 0.5);
 }
 
-/* Breakpoint Indicator */
+/* Breakpoint Indicator
+   Colours are the GridLens teal family on a dark panel, rather than the neon
+   cyan and green they used to be - those matched nothing else in the product. */
 .gridlens-breakpoint-indicator {
   position: fixed;
   top: 20px;
@@ -91,20 +93,20 @@
 .gridlens-bp-name {
   font-size: 18px;
   font-weight: bold;
-  color: #00d4ff;
+  color: #4cb8b1;
   margin-bottom: 4px;
   letter-spacing: 1px;
 }
 
 .gridlens-bp-width {
   font-size: 16px;
-  color: #00ff88;
+  color: #e3ebe9;
   margin-bottom: 2px;
 }
 
 .gridlens-bp-range {
   font-size: 11px;
-  color: #aaa;
+  color: #8aa09c;
   margin-top: 4px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding-top: 4px;
