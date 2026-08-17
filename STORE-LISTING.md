@@ -68,6 +68,18 @@ GridLens is an independent project. It is not affiliated with, endorsed by, or
 sponsored by the Bootstrap project or its maintainers.
 ```
 
+## URLs
+
+Both forms ask for these.
+
+| Field | Value |
+|---|---|
+| Homepage | `https://christian-codez.github.io/gridlens-for-bootstrap/` |
+| Privacy policy | `https://christian-codez.github.io/gridlens-for-bootstrap/privacy/` |
+| Support site | `https://christian-codez.github.io/gridlens-for-bootstrap/support/` |
+| Support email | `nwachukwu16@gmail.com` |
+| Source repository | `https://github.com/christian-codez/gridlens-for-bootstrap` |
+
 ## Category
 
 - **Chrome:** Developer Tools

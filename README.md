@@ -34,9 +34,20 @@ otherwise mean digging through DevTools:
 - Pick one from the dropdown and open it — no trigger button needed
 - Works with Bootstrap 3, 4, and 5
 
+## Links
+
+- **Homepage** — https://christian-codez.github.io/gridlens-for-bootstrap/
+- **Privacy policy** — https://christian-codez.github.io/gridlens-for-bootstrap/privacy/
+- **Support** — https://christian-codez.github.io/gridlens-for-bootstrap/support/
+
 ## Install
 
 Not yet published to either store. To run it from source:
+
+```sh
+git clone https://github.com/christian-codez/gridlens-for-bootstrap.git
+cd gridlens-for-bootstrap
+```
 
 **Chrome**
 1. Clone or download this repository
@@ -109,6 +120,12 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 ## Version
 
 1.2.0
+
+## Packaging
+
+`./package.sh` builds the store submission zip into `dist/`. It includes only
+the files the extension ships and puts `manifest.json` at the zip root, which
+both stores require.
 
 ## License
 
