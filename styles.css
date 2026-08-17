@@ -71,13 +71,18 @@
 }
 
 /* Breakpoint Indicator
-   Colours are the GridLens teal family on a dark panel, rather than the neon
-   cyan and green they used to be - those matched nothing else in the product. */
+   Colours come from the CHADA palette (themes/chada/src/scss/abstracts/
+   _variables.scss): $chada-surface panel, $chada-border hairline, $chada-lime
+   for the breakpoint name, $chada-ink for the width, $chada-soft for the range.
+
+   Kept as literals rather than custom properties on purpose: this stylesheet is
+   injected into every page the user visits, and defining tokens on :root here
+   would leak them into other people's documents. */
 .gridlens-breakpoint-indicator {
   position: fixed;
   top: 20px;
   right: 20px;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(20, 22, 19, 0.94);
   color: white;
   padding: 12px 16px;
   border-radius: 8px;
@@ -85,7 +90,8 @@
   font-size: 14px;
   z-index: 1000000;
   pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  border: 1px solid #26281f;
   display: none;
   min-width: 150px;
 }
@@ -93,22 +99,22 @@
 .gridlens-bp-name {
   font-size: 18px;
   font-weight: bold;
-  color: #4cb8b1;
+  color: #cdfb47;
   margin-bottom: 4px;
   letter-spacing: 1px;
 }
 
 .gridlens-bp-width {
   font-size: 16px;
-  color: #e3ebe9;
+  color: #edefe6;
   margin-bottom: 2px;
 }
 
 .gridlens-bp-range {
   font-size: 11px;
-  color: #8aa09c;
+  color: #8a8d83;
   margin-top: 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid #26281f;
   padding-top: 4px;
 }
 

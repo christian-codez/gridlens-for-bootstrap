@@ -8,35 +8,25 @@
 <meta name="description" content="A browser extension for building and debugging Bootstrap layouts: pixel-accurate grid overlay, live breakpoint readout, tooltip viewer, and modal opener.">
 <style>
   :root {
-    --bg: #f1f4f3; --surface: #fff; --surface-2: #e9eeed;
-    --ink: #101e1c; --ink-2: #354744; --muted: #61736f;
-    --rule: #d3ddda; --accent: #0b6e6b; --accent-wash: #dceae8; --on-accent: #fff;
-    --ok: #37702f; --ok-wash: #e4efe0;
-    --font-body: Charter, "Bitstream Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0d1514; --surface: #151f1e; --surface-2: #1c2827;
-      --ink: #e3ebe9; --ink-2: #c0cecb; --muted: #8aa09c;
-      --rule: #273634; --accent: #4cb8b1; --accent-wash: #13302e; --on-accent: #0d1514;
-      --ok: #85be79; --ok-wash: #1a2a17;
-    }
+    --bg: #0a0b0a; --surface: #141613; --surface-2: #101210;
+    --ink: #edefe6; --ink-2: #b9bcb2; --muted: #8a8d83;
+    --rule: #26281f; --accent: #cdfb47; --accent-wash: #1d2410;
+    --on-accent: #0a0b0a; --ok: #2f9e6a; --ok-wash: #16240f;
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0; padding: 0 20px 90px; background: var(--bg); color: var(--ink);
+    margin: 0; padding: 0 20px 90px; background: var(--bg); color: var(--ink-2);
     font: 17px/1.62 var(--font-body); -webkit-font-smoothing: antialiased;
   }
   main { max-width: 47rem; margin: 0 auto; }
 
   header { padding: 64px 0 30px; border-bottom: 2px solid var(--ink); }
-  .mark { display: block; margin-bottom: 18px; border-radius: 12px; }
+  .mark { display: block; margin-bottom: 18px; border-radius: 12px; outline: 1px solid var(--rule); }
   .eyebrow {
     font: 700 11px/1.4 var(--font-mono); letter-spacing: .14em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
   }
+  h1, h2, h3 { color: var(--ink); letter-spacing: -0.02em; }
   h1 {
     font-size: clamp(2.1rem, 6vw, 3rem); line-height: 1.06; margin: 0 0 14px;
     font-weight: 600; letter-spacing: -.02em; text-wrap: balance;
@@ -118,7 +108,7 @@
 <main>
 
 <header>
-  <svg class="mark" viewBox="0 0 128 128" width="52" height="52" aria-hidden="true"><defs><linearGradient id="glt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#12837f"/><stop offset="1" stop-color="#06504d"/></linearGradient></defs><rect width="128" height="128" rx="28" fill="url(#glt)"/><g fill="#fff"><rect x="26" y="38" width="20" height="52" rx="6"/><rect x="54" y="24" width="20" height="80" rx="6"/><rect x="82" y="38" width="20" height="52" rx="6"/></g></svg>
+  <svg class="mark" viewBox="0 0 128 128" width="52" height="52" aria-hidden="true"><defs><linearGradient id="glt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#171a14"/><stop offset="1" stop-color="#0a0b0a"/></linearGradient></defs><rect width="128" height="128" rx="28" fill="url(#glt)"/><g fill="#cdfb47"><rect x="26" y="38" width="20" height="52" rx="6"/><rect x="54" y="24" width="20" height="80" rx="6"/><rect x="82" y="38" width="20" height="52" rx="6"/></g></svg>
   <div class="eyebrow">Browser extension · Chrome &amp; Firefox</div>
   <h1>GridLens for Bootstrap</h1>
   <p class="standfirst">Overlay the real Bootstrap grid, watch the breakpoint change as you resize, reveal every tooltip at once, and open any modal — including the ones with no trigger button.</p>

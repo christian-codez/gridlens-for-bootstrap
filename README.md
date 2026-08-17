@@ -138,7 +138,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.6.1
+1.7.0
 
 ## Icons
 
@@ -153,6 +153,32 @@ The mark is three grid columns in GridLens teal, designed at 16px first — a le
 ring turned to mush at toolbar size, and a plain magnifier is indistinguishable
 from a dozen other extensions in the same toolbar. The columns echo the Grid tab
 icon in the popup, so the mark and the UI read as one family.
+
+## Theme
+
+Colours come from the CHADA Creatives palette, taken from that theme's source of
+truth at `src/scss/abstracts/_variables.scss`. (Its `theme.json` still lists an
+older orange primary and is stale.)
+
+| Token | Value | Role |
+|---|---|---|
+| `$chada-lime` | `#cdfb47` | Primary — CTAs, active states, focus |
+| `$chada-emerald` | `#2f9e6a` | Toolbar badge only, see below |
+| `$chada-bg` | `#0a0b0a` | Ground |
+| `$chada-surface` | `#141613` | Panels and cards |
+| `$chada-border` | `#26281f` | Hairlines |
+| `$chada-ink` | `#edefe6` | Headings |
+| `$chada-body` | `#b9bcb2` | Body copy |
+
+The palette is dark-first by construction: lime scores about 1.3:1 against white
+and about 16:1 against `#0a0b0a`, so it only works on a dark ground. The popup is
+dark because the brand colour requires it, not as a style preference.
+
+**The badge is emerald, not lime, on purpose.** Chrome paints it over the icon,
+and the icon is a dark tile carrying lime columns — a lime badge sits at 1.0:1
+against those columns, which is what made the breakpoint hard to read. Emerald is
+the only palette colour that stays legible (5.8:1 for its text) while reading as
+clearly separate from both the tile and the columns.
 
 The popup palette is defined once as CSS custom properties at the top of
 `popup.css`. Add colours there rather than inline, or the identity drifts —

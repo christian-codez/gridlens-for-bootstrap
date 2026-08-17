@@ -7,23 +7,20 @@
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <style>
   :root {
-    --bg: #f1f4f3; --surface: #fff; --ink: #101e1c; --ink-2: #354744;
-    --muted: #61736f; --rule: #d3ddda; --accent: #0b6e6b;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0d1514; --surface: #151f1e; --ink: #e3ebe9; --ink-2: #c0cecb;
-      --muted: #8aa09c; --rule: #273634; --accent: #4cb8b1;
-    }
+    --bg: #0a0b0a; --surface: #141613; --surface-2: #101210;
+    --ink: #edefe6; --ink-2: #b9bcb2; --muted: #8a8d83;
+    --rule: #26281f; --accent: #cdfb47; --accent-wash: #1d2410;
+    --on-accent: #0a0b0a; --ok: #2f9e6a; --ok-wash: #16240f;
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0; padding: 0 20px 80px; background: var(--bg); color: var(--ink);
+    margin: 0; padding: 0 20px 80px; background: var(--bg); color: var(--ink-2);
     font: 17px/1.62 Charter, "Iowan Old Style", Georgia, serif;
     -webkit-font-smoothing: antialiased;
   }
   main { max-width: 44rem; margin: 0 auto; }
   header { padding: 56px 0 24px; border-bottom: 2px solid var(--ink); }
+  h1, h2, h3 { color: var(--ink); letter-spacing: -0.02em; }
   h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.1; margin: 0 0 8px; font-weight: 600; }
   .updated {
     font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;

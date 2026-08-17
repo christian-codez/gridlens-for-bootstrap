@@ -1,41 +1,56 @@
 /* GridLens for Bootstrap - Popup Styles */
 
-/* Palette
+/* Palette — CHADA Creatives
    ------------------------------------------------------------------
-   One source of truth for the identity. The popup previously mixed an
-   indigo-purple inherited from the original Bootstrap Toolkit with the teal
-   introduced when the extension was renamed, so the header and buttons
-   disagreed with the toolbar badge, the container-type switch and the
-   project's own website. Everything now derives from these tokens.
+   Lifted from the agency theme's source of truth,
+   themes/chada/src/scss/abstracts/_variables.scss. (Note theme.json in that
+   repo still lists an older orange primary and is stale; the SCSS is current.)
 
-   Teal is deliberately not Bootstrap's brand purple - this is an
-   unaffiliated project and should not borrow their palette. */
+   This palette is dark-first by construction. The lime primary scores about
+   1.3:1 against white and about 16:1 against #0a0b0a, so it only works on a
+   dark ground - the popup is dark because the brand colour requires it, not as
+   a style preference. It also closes the "no dark mode" gap from the audit.
+
+   Emerald exists here for one job: the toolbar badge. It is the only palette
+   colour that stays legible while reading as clearly different from both the
+   icon's dark tile and its lime columns. */
 :root {
-  --gl-accent: #0b6e6b;
-  --gl-accent-strong: #08504e;
-  --gl-accent-bright: #12837f;
-  --gl-accent-deep: #043c3a;
-  --gl-accent-soft: #dceae8;
-  --gl-accent-tint: #eef4f3;
-  --gl-gradient: linear-gradient(135deg, #12837f 0%, #06504d 100%);
+  --gl-bg: #0a0b0a;              /* $chada-bg      */
+  --gl-surface: #141613;         /* $chada-surface */
+  --gl-surface-2: #101210;       /* $chada-surface-alt */
+  --gl-surface-3: #1a1d17;
+  --gl-panel: #0d0f0a;           /* $chada-panel   */
 
-  --gl-ink: #101e1c;
-  --gl-ink-2: #354744;
-  --gl-muted: #61736f;
-  --gl-faint: #8c9c99;
+  --gl-accent: #cdfb47;          /* $chada-lime — CTAs, active states, focus */
+  --gl-accent-bright: #dcff6b;   /* $chada-lime-bright — solid-CTA hover */
+  --gl-accent-strong: #b6e236;
+  --gl-accent-soft: #1d2410;
+  --gl-accent-tint: #14180d;
+  --gl-on-accent: #0a0b0a;       /* text on a lime fill */
+  --gl-emerald: #2f9e6a;         /* $chada-emerald */
 
-  --gl-surface: #ffffff;
-  --gl-surface-2: #f2f5f4;
-  --gl-surface-3: #e8eeed;
-  --gl-rule: #d3ddda;
-  --gl-rule-soft: #e3eae8;
+  --gl-ink: #edefe6;             /* $chada-ink  — headings */
+  --gl-ink-2: #b9bcb2;           /* $chada-body — body copy */
+  --gl-muted: #8a8d83;           /* $chada-soft */
+  --gl-faint: #70746a;           /* $chada-muted */
 
-  --gl-ok: #2f7d55;
-  --gl-danger: #b3392f;
-  --gl-danger-strong: #8f2c24;
-  --gl-note-bg: #fdf6e6;
-  --gl-note-border: #d8a72e;
-  --gl-note-ink: #6b4d0d;
+  --gl-rule: #26281f;            /* $chada-border */
+  --gl-rule-soft: #1b1d17;
+  --gl-border-soft: #2a2c28;     /* $chada-border-soft */
+
+  --gl-ok: #2f9e6a;
+  --gl-danger: #e4606d;
+  --gl-danger-strong: #c9414e;
+  --gl-note-bg: #16180f;
+  --gl-note-border: #cdfb47;
+  --gl-note-ink: #c8cbb8;
+
+  /* Headings follow the theme's type treatment: heavy, tight tracking. The
+     brand faces (Cabinet Grotesk, Inter) are not system fonts and cannot be
+     fetched from an extension, so the stack falls through to the closest
+     grotesques already on the machine. */
+  --gl-font-heading: 'Cabinet Grotesk', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --gl-font-body: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 * {
@@ -47,12 +62,13 @@
 body {
   width: 380px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--gl-gradient);
-  color: var(--gl-ink);
+  background: var(--gl-bg);
+  color: var(--gl-ink-2);
+  font-family: var(--gl-font-body);
 }
 
 .container {
-  background: white;
+  background: var(--gl-bg);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -60,13 +76,17 @@ body {
 
 /* Header */
 header {
-  background: var(--gl-gradient);
+  background: var(--gl-surface);
   padding: 16px 20px;
   text-align: center;
-  color: white;
+  color: var(--gl-ink);
+  border-bottom: 1px solid var(--gl-rule);
 }
 
 header h1 {
+  font-family: var(--gl-font-heading);
+  font-weight: 800;
+  letter-spacing: -0.03em;
   font-size: 20px;
   margin-bottom: 4px;
   display: flex;
@@ -106,7 +126,7 @@ header h1 {
 }
 
 .tab-btn.active {
-  background: white;
+  background: var(--gl-bg);
   border-bottom-color: var(--gl-accent);
 }
 
@@ -149,8 +169,8 @@ header h1 {
 .btn-toggle {
   width: 100%;
   padding: 14px;
-  background: var(--gl-gradient);
-  color: white;
+  background: var(--gl-accent);
+  color: var(--gl-on-accent);
   border: none;
   border-radius: 8px;
   font-size: 15px;
@@ -187,9 +207,12 @@ header h1 {
 }
 
 .btn-toggle:disabled {
-  opacity: .5;
+  /* Fading the lime fill instead of replacing it turns it to sludge on a dark
+     ground - fine over white, muddy olive here. A flat surface with muted text
+     reads as disabled cleanly. */
+  background: var(--gl-surface-3);
+  color: var(--gl-faint);
   cursor: not-allowed;
-  filter: grayscale(.35);
 }
 
 .btn-toggle:disabled:hover {
@@ -305,7 +328,7 @@ header h1 {
 .collapsible-content {
   display: none;
   padding: 14px;
-  background: white;
+  background: var(--gl-surface-2);
 }
 
 .collapsible-content.expanded {
@@ -424,7 +447,7 @@ header h1 {
 
 .btn-add:hover {
   background: var(--gl-accent);
-  color: white;
+  color: var(--gl-on-accent);
   border-style: solid;
 }
 
@@ -432,7 +455,7 @@ header h1 {
   width: 100%;
   padding: 6px;
   background: var(--gl-danger);
-  color: white;
+  color: var(--gl-on-accent);
   border: none;
   border-radius: 4px;
   font-size: 11px;
@@ -472,7 +495,7 @@ header h1 {
 
 .btn-primary-small {
   background: var(--gl-accent);
-  color: white;
+  color: var(--gl-on-accent);
 }
 
 .btn-primary-small:hover {
@@ -512,7 +535,7 @@ header h1 {
   border-radius: 6px;
   font-size: 14px;
   color: var(--gl-ink);
-  background: white;
+  background: var(--gl-surface);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -591,11 +614,11 @@ header h1 {
   border-radius: 8px;
   font-size: 14px;
   color: var(--gl-ink);
-  background: white;
+  background: var(--gl-surface);
   cursor: pointer;
   transition: all 0.2s;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230b6e6b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23cdfb47' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   padding-right: 36px;
@@ -744,7 +767,7 @@ footer .disclaimer {
   left: 50%;
   transform: translateX(-50%);
   background: var(--gl-ok);
-  color: white;
+  color: var(--gl-on-accent);
   padding: 10px 20px;
   border-radius: 6px;
   font-size: 13px;
