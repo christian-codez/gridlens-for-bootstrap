@@ -14,6 +14,8 @@ otherwise mean digging through DevTools:
 ## Features
 
 ### Grid Overlay
+- Per-tab visibility — switching the grid on for the page you're working on
+  leaves every other tab alone, and it clears when the tab closes
 - Toggle a 12-column grid overlay that matches Bootstrap's real container
   geometry - correct max-widths and gutters for whichever major version the page
   uses, verified pixel-exact against Bootstrap 5.3 at every breakpoint
@@ -119,13 +121,20 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.2.0
+1.3.0
 
 ## Packaging
 
-`./package.sh` builds the store submission zip into `dist/`. It includes only
-the files the extension ships and puts `manifest.json` at the zip root, which
-both stores require.
+`./package.sh` builds the store submission zip into `dist/`, then lints it.
+
+Files are staged into `dist/pkg/` and zipped from there, so `manifest.json` is
+structurally guaranteed to sit at the zip root — both stores reject a zip of the
+containing folder. Only the files the extension ships are included; `docs/`,
+`demo/` and the tooling stay out.
+
+The lint runs against the staged payload rather than the working tree, so it
+validates exactly what gets uploaded. Expect 0 errors and 2 known warnings,
+both documented in `STORE-LISTING.md`.
 
 ## License
 

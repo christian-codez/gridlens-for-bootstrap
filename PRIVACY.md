@@ -20,21 +20,24 @@ navigate away from a page, nothing about it is kept.
 
 ## What the extension stores
 
-GridLens saves five preferences using your browser's built-in extension storage:
+GridLens saves four preferences using your browser's built-in extension storage:
 
 | Setting | What it holds |
 |---|---|
 | `gridColor` | The overlay colour you picked |
 | `customBreakpoints` | Any custom breakpoint names and widths you defined |
-| `gridVisible` | Whether the grid overlay is currently switched on |
 | `bootstrapVersion` | Your Bootstrap version override, or `auto` |
 | `containerType` | Whether the overlay draws a `.container` or `.container-fluid` |
 
 These are stored through the browser's `storage.sync` API. If you are signed in to
-Chrome or Firefox with sync enabled, your browser may sync these five values across
+Chrome or Firefox with sync enabled, your browser may sync these four values across
 your own devices, in the same way it syncs your bookmarks. That transfer is handled
 by your browser under its own privacy policy — the extension author has no access to
 it and operates no server that could receive it.
+
+Separately, whether the grid overlay is currently switched on is held per browser
+tab in session storage. It is never synced, never leaves the device, and is
+discarded when you close the tab or quit the browser.
 
 You can erase all of it at any time by removing the extension, or by using the reset
 buttons in the extension's popup.
@@ -50,8 +53,9 @@ buttons in the extension's popup.
 
 ## Permissions, and why each is needed
 
-**`storage`** — to save the five preferences listed above so they survive a browser
-restart.
+**`storage`** — to save the four preferences listed above so they survive a browser
+restart, and to track which tabs currently have the grid switched on for the
+length of the browsing session.
 
 **`activeTab`** — so the popup can talk to the current tab when you click the toolbar
 icon. Granted only for the tab you are looking at, only while you are using the

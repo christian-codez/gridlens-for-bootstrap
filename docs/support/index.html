@@ -77,8 +77,9 @@
 <h3>Nothing happens on this page</h3>
 <p>The extension can't run on browser-internal pages — <code>chrome://</code>, <code>about:</code>, the Chrome Web Store, and Firefox's add-on gallery are all off limits to every extension, by browser policy rather than by choice. It also won't run on tabs that were already open when you installed it; reload those once.</p>
 
-<h3>The grid is showing on sites I didn't ask for</h3>
-<p>Grid visibility is currently remembered globally rather than per tab, so leaving it on means it appears on pages you open afterwards. Toggle it off in the popup. This is a known rough edge and is being changed to per-tab state.</p>
+<h3>Does the grid follow me to other sites?</h3>
+<p>No. Grid visibility is per tab. Switching it on for the page you're working on leaves every other tab untouched, and new tabs always open clean. It survives reloading and navigating within that same tab — which is what you want while iterating on a layout — and clears when you close the tab or quit the browser.</p>
+<p>If you're on a version before 1.3.0, visibility was remembered globally and did follow you between sites. Updating fixes it.</p>
 
 <h3>Tooltips or modals don't respond</h3>
 <p>Confirm the page actually uses Bootstrap's JavaScript, not just its stylesheet. The Tooltips tab reports the detected version — if it shows "None/Custom", the page has no Bootstrap JS for the extension to drive, and only the fallback tooltip rendering is available.</p>

@@ -157,14 +157,23 @@
     updateBreakpointIndicator();
   }
 
+  function applyGridVisibility() {
+    if (gridOverlay) gridOverlay.style.display = isGridVisible ? 'block' : 'none';
+    if (breakpointIndicator) breakpointIndicator.style.display = isGridVisible ? 'block' : 'none';
+  }
+
+  // Preferences live in storage.sync - they belong to the user and should
+  // follow them across devices.
+  //
+  // Visibility deliberately does not. It's per-tab state owned by the
+  // background script, because a grid switched on for one page should not
+  // reappear on every site opened afterwards. A content script can't see its
+  // own tab id, so we ask.
   function loadGridSettings() {
-    return new Promise((resolve) => {
-      chrome.storage.sync.get(['customBreakpoints', 'gridVisible', 'gridColor', 'containerType'], (result) => {
+    const prefs = new Promise((resolve) => {
+      chrome.storage.sync.get(['customBreakpoints', 'gridColor', 'containerType'], (result) => {
         if (result.customBreakpoints) {
           customBreakpoints = result.customBreakpoints;
-        }
-        if (result.gridVisible !== undefined) {
-          isGridVisible = result.gridVisible;
         }
         if (result.gridColor) {
           gridColor = result.gridColor;
@@ -172,16 +181,28 @@
         if (result.containerType) {
           containerType = result.containerType;
         }
-        // After settings are loaded and possibly after overlay/indicator are created, update their display
-        if (gridOverlay) gridOverlay.style.display = isGridVisible ? 'block' : 'none';
-        if (breakpointIndicator) breakpointIndicator.style.display = isGridVisible ? 'block' : 'none';
-        if (gridOverlay) {
-          applyGridGeometry();
-          applyGridColor();
-        }
-
         resolve();
       });
+    });
+
+    const visibility = chrome.runtime
+      .sendMessage({ action: 'getTabGridVisible' })
+      .then((response) => {
+        isGridVisible = !!(response && response.visible);
+      })
+      .catch(() => {
+        // Background unreachable (mid-update, or torn down during teardown).
+        // Staying hidden is the safe default - it never puts an overlay on a
+        // page the user didn't ask for.
+        isGridVisible = false;
+      });
+
+    return Promise.all([prefs, visibility]).then(() => {
+      applyGridVisibility();
+      if (gridOverlay) {
+        applyGridGeometry();
+        applyGridColor();
+      }
     });
   }
 
@@ -231,15 +252,16 @@
 
   function toggleGrid() {
     isGridVisible = !isGridVisible;
-    
-    if (gridOverlay) {
-      gridOverlay.style.display = isGridVisible ? 'block' : 'none';
-    }
-    if (breakpointIndicator) {
-      breakpointIndicator.style.display = isGridVisible ? 'block' : 'none';
-    }
-    
-    chrome.storage.sync.set({ gridVisible: isGridVisible });
+    applyGridVisibility();
+
+    // Recorded against this tab only. The background attributes it using
+    // sender.tab.id, so the state can never leak to another tab or device.
+    chrome.runtime
+      .sendMessage({ action: 'setTabGridVisible', visible: isGridVisible })
+      .catch(() => {
+        // The overlay has already been toggled on screen; failing to record it
+        // only means it won't survive a reload of this tab.
+      });
   }
 
   function getCurrentBreakpoint() {

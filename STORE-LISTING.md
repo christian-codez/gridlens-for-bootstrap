@@ -1,4 +1,4 @@
-# Store submission answers — GridLens for Bootstrap v1.2.0
+# Store submission answers — GridLens for Bootstrap v1.3.0
 
 Everything the Chrome and Firefox submission forms ask for, written out in advance.
 Copy from here into the forms rather than composing in the browser.
@@ -61,7 +61,7 @@ overrides them, define your own and the readout follows your values.
 
 PRIVACY
 No analytics, no telemetry, no accounts, no servers. GridLens sends nothing
-anywhere. Your five settings are saved in your browser's own extension storage
+anywhere. Your four settings are saved in your browser's own extension storage
 and nowhere else. Full policy: https://christian-codez.github.io/gridlens-for-bootstrap/privacy/
 
 GridLens is an independent project. It is not affiliated with, endorsed by, or
@@ -109,11 +109,14 @@ purpose: inspecting Bootstrap components on the page currently open.
 
 **`storage`**
 ```
-Saves five user preferences so they survive a browser restart: the grid overlay
-colour, any custom breakpoint definitions the user has entered, whether the grid
-is currently toggled on, the user's Bootstrap version override, and whether the
-overlay draws a .container or a .container-fluid. No other data is written to
-storage.
+Saves four user preferences so they survive a browser restart: the grid overlay
+colour, any custom breakpoint definitions the user has entered, the user's
+Bootstrap version override, and whether the overlay draws a .container or a
+.container-fluid.
+
+Also used for session-scoped state: which tabs currently have the grid switched
+on. That is per-tab, never synced, and discarded when the browser closes. No
+other data is written to storage.
 ```
 
 **`activeTab`**
@@ -196,7 +199,8 @@ On permissions: the content script matches <all_urls> because a developer using
 this tool may be working on any origin — localhost, staging, a client's domain.
 It reads page structure to draw the overlay and find Bootstrap components, and
 does nothing else with it. There is no analytics, no telemetry, no remote code,
-and no server. Settings are five values in storage.sync and nothing more.
+and no server. Settings are four values in storage.sync, plus per-tab grid visibility in
+session storage, and nothing more.
 
 On the MAIN-world content script: injected.js is declared with "world": "MAIN"
 because reaching Bootstrap's own instance APIs (bootstrap.Modal.getInstance,
@@ -233,15 +237,20 @@ On the two validator warnings, both of which are intentional:
 ### Validator status at time of writing
 
 ```
-$ npx web-ext@8.9.0 lint --source-dir . --ignore-files 'demo/**'
+$ ./package.sh
 
 errors     0
 notices    0
 warnings   2   (both explained in the reviewer notes above)
 ```
 
-Re-run this before every upload. Errors block submission; these two warnings do
-not, and should stay at exactly two — a third means something new was introduced.
+`package.sh` stages the shipped files, builds the zip, and lints the staged
+payload — so this validates exactly what you upload, not the working tree.
+Linting the working tree instead reports a spurious third warning for
+`package.sh` itself, which never ships.
+
+Re-run before every upload. Errors block submission; these two warnings do not,
+and should stay at exactly two — a third means something new was introduced.
 
 ---
 

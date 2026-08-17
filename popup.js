@@ -23,6 +23,7 @@ const CONTAINER_HINTS = {
 
 // ===== Initialize =====
 document.addEventListener('DOMContentLoaded', () => {
+  showVersion();
   setupTabs();
   loadSettings();
   setupGridPanel();
@@ -33,6 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Update breakpoint every second
   setInterval(updateCurrentBreakpoint, 1000);
 });
+
+// Read the version from the manifest rather than hardcoding it in the footer,
+// where it silently fell out of step with manifest.json across two releases.
+function showVersion() {
+  const el = document.getElementById('ext-version');
+  if (el) el.textContent = 'v' + chrome.runtime.getManifest().version;
+}
 
 // ===== Tab Navigation =====
 function setupTabs() {
@@ -95,8 +103,12 @@ function showStatus(message, type = 'success') {
 }
 
 // ===== Settings =====
+//
+// Preferences come from storage.sync. Grid visibility does not - it belongs to
+// the active tab, so it's read from that tab's content script instead. Reading
+// it from sync would show a toggle that doesn't match what's on screen.
 function loadSettings() {
-  chrome.storage.sync.get(['customBreakpoints', 'gridVisible', 'gridColor', 'bootstrapVersion', 'containerType'], (result) => {
+  chrome.storage.sync.get(['customBreakpoints', 'gridColor', 'bootstrapVersion', 'containerType'], (result) => {
     if (result.containerType) {
       containerType = result.containerType;
     }
@@ -106,20 +118,31 @@ function loadSettings() {
       customBreakpoints = result.customBreakpoints;
       renderBreakpoints();
     }
-    
-    if (result.gridVisible !== undefined) {
-      isGridVisible = result.gridVisible;
-      updateGridToggleButton();
-    }
-    
+
     if (result.gridColor) {
       gridColor = result.gridColor;
       document.getElementById('gridColor').value = gridColor;
     }
-    
+
     if (result.bootstrapVersion) {
       document.getElementById('version-select').value = result.bootstrapVersion;
     }
+  });
+
+  loadTabGridState();
+}
+
+function loadTabGridState() {
+  sendMessageToTab({ action: 'getGridState' }).then(response => {
+    if (!response) return;
+    isGridVisible = !!response.visible;
+    updateGridToggleButton();
+  }).catch(() => {
+    // No content script on this tab (a chrome:// page, the Web Store, a PDF,
+    // or a tab opened before the extension was installed). Leave the toggle in
+    // its default hidden state.
+    isGridVisible = false;
+    updateGridToggleButton();
   });
 }
 
