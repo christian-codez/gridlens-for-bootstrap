@@ -9,22 +9,22 @@
 <body>
   <div class="container">
     <header>
-      <h1>🔍 GridLens</h1>
+      <h1><span class="icon icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 21 21"/><path d="M10.5 4v13M4 10.5h13" stroke-width="1.1" opacity=".55"/></svg></span>GridLens</h1>
       <p class="subtitle">Grid • Tooltips • Modals</p>
     </header>
 
     <!-- Tab Navigation -->
     <nav class="tabs">
       <button class="tab-btn active" data-tab="grid">
-        <span class="tab-icon">📐</span>
+        <span class="tab-icon icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="1.8"/><path d="M9 4.5v15M15 4.5v15"/></svg></span>
         <span class="tab-text">Grid</span>
       </button>
       <button class="tab-btn" data-tab="tooltips">
-        <span class="tab-icon">💬</span>
+        <span class="tab-icon icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.4a7.9 7.9 0 0 1-8.5 7.9 9 9 0 0 1-2.5-.4L4.5 20.5l1.4-4.4a7.7 7.7 0 0 1-1.4-4.7 7.9 7.9 0 0 1 8-7.9 7.9 7.9 0 0 1 8 7.9z"/><path d="M8.8 11.4h.01M12 11.4h.01M15.2 11.4h.01" stroke-width="2.1"/></svg></span>
         <span class="tab-text">Tooltips</span>
       </button>
       <button class="tab-btn" data-tab="modals">
-        <span class="tab-icon">🗔</span>
+        <span class="tab-icon icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.75" y="4.75" width="18.5" height="14.5" rx="2"/><path d="M2.75 9.25h18.5"/><path d="M5.9 7h.01M8.4 7h.01" stroke-width="1.9"/></svg></span>
         <span class="tab-text">Modals</span>
       </button>
     </nav>
@@ -34,7 +34,7 @@
       <div class="panel-content">
         <div class="toggle-section">
           <button id="toggleGrid" class="btn-toggle">
-            <span id="toggleGridIcon">◻</span>
+            <span class="icon icon-off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="1.8"/><path d="M9 4.5v15M15 4.5v15"/></svg></span><span class="icon icon-on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="1.8"/><path d="M9 4.5v15M15 4.5v15"/><path d="M3.9 5.4h4.2v13.2H3.9zM15.9 5.4h4.2v13.2h-4.2z" fill="currentColor" stroke="none" opacity=".3"/></svg></span>
             <span id="toggleGridText">Show Grid</span>
           </button>
         </div>
@@ -81,7 +81,7 @@
         <div class="collapsible-section">
           <button class="collapsible-header" data-target="breakpoints-section">
             <span>Custom Breakpoints</span>
-            <span class="collapse-icon">▼</span>
+            <span class="collapse-icon icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 9.5 12 15l5.5-5.5"/></svg></span>
           </button>
           <div id="breakpoints-section" class="collapsible-content">
             <p class="help-text">Add custom breakpoints or use Bootstrap defaults.</p>
@@ -126,12 +126,12 @@
         </div>
 
         <button id="toggleTooltips" class="btn-toggle">
-          <span id="toggleTooltipsIcon">👁️</span>
+          <span class="icon icon-off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.2 12S5.6 5.9 12 5.9 21.8 12 21.8 12 18.4 18.1 12 18.1 2.2 12 2.2 12z"/><circle cx="12" cy="12" r="2.9"/></svg></span><span class="icon icon-on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.2 6.1A9.6 9.6 0 0 1 12 5.9c6.4 0 9.8 6.1 9.8 6.1a18 18 0 0 1-2.6 3.6"/><path d="M6.4 6.7A17.9 17.9 0 0 0 2.2 12S5.6 18.1 12 18.1a9.5 9.5 0 0 0 3.7-.7"/><path d="M10 10a2.9 2.9 0 0 0 4 4"/><path d="M3 3l18 18"/></svg></span>
           <span id="toggleTooltipsText">Show All Tooltips</span>
         </button>
 
         <div class="info-box">
-          <p>💡 Click the button to toggle all Bootstrap tooltips on the current page.</p>
+          <p><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 18.5h5M10.5 21.5h3"/><path d="M12 2.5a6 6 0 0 0-3.5 10.9 2.6 2.6 0 0 1 1 1.7l.1.9h4.8l.1-.9a2.6 2.6 0 0 1 1-1.7A6 6 0 0 0 12 2.5z"/></svg></span>Click the button to toggle all Bootstrap tooltips on the current page.</p>
         </div>
       </div>
     </section>
@@ -147,7 +147,7 @@
         </div>
 
         <button id="openModal" class="btn-toggle">
-          <span>🗔</span>
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.75" y="4.75" width="18.5" height="14.5" rx="2"/><path d="M2.75 9.25h18.5"/><path d="M5.9 7h.01M8.4 7h.01" stroke-width="1.9"/></svg></span>
           <span>Open Selected Modal</span>
         </button>
 
@@ -163,11 +163,11 @@
         </div>
 
         <button id="refreshModals" class="btn-secondary-small btn-full">
-          🔄 Refresh Modal List
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5v5h-5"/></svg></span><span>Refresh Modal List</span>
         </button>
 
         <div class="info-box">
-          <p>💡 Select a modal from the dropdown and click "Open" to display it.</p>
+          <p><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 18.5h5M10.5 21.5h3"/><path d="M12 2.5a6 6 0 0 0-3.5 10.9 2.6 2.6 0 0 1 1 1.7l.1.9h4.8l.1-.9a2.6 2.6 0 0 1 1-1.7A6 6 0 0 0 12 2.5z"/></svg></span>Select a modal from the dropdown and click "Open" to display it.</p>
           <p class="note">Works with Bootstrap 3, 4, and 5 modals!</p>
         </div>
       </div>

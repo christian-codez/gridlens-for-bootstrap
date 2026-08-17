@@ -31,6 +31,10 @@ header {
 header h1 {
   font-size: 20px;
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .subtitle {
@@ -69,7 +73,13 @@ header h1 {
 }
 
 .tab-icon {
-  font-size: 18px;
+  font-size: 19px;
+  color: #94a3b8;
+  transition: color .2s;
+}
+
+.tab-btn.active .tab-icon {
+  color: #667eea;
 }
 
 .tab-text {
@@ -226,7 +236,8 @@ header h1 {
 
 .collapse-icon {
   transition: transform 0.2s;
-  font-size: 10px;
+  font-size: 15px;
+  color: #94a3b8;
 }
 
 .collapsible-header.expanded .collapse-icon {
@@ -376,6 +387,15 @@ header h1 {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  /* Buttons that lead with an icon need the gap; harmless on ones that don't. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.btn-secondary-small .icon {
+  font-size: 15px;
 }
 
 .btn-primary-small {
@@ -531,6 +551,39 @@ header h1 {
   padding: 10px;
 }
 
+/* Icons
+   ------------------------------------------------------------------
+   Inline SVG rather than emoji. The previous set mixed characters with
+   wildly different support: U+1F5D4 DESKTOP WINDOW (the Modals tab) has no
+   emoji presentation and almost no font ships a glyph, so it rendered as an
+   empty box, while others fell back to thin monochrome outlines next to a
+   full-colour magnifying glass. SVG renders identically everywhere and
+   inherits currentColor, so icons follow their button's state. */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  line-height: 0;
+}
+
+.icon svg {
+  width: 1em;
+  height: 1em;
+  display: block;
+}
+
+.icon-lg svg {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+/* Two-state icons: both live in the DOM and CSS reveals the right one, so no
+   markup has to be rebuilt when a button toggles. */
+.icon-on { display: none; }
+.btn-toggle.active .icon-off { display: none; }
+.btn-toggle.active .icon-on { display: inline-flex; }
+
 /* Container Type Switch */
 .container-type-group {
   display: flex;
@@ -569,6 +622,20 @@ header h1 {
 
 #container-hint {
   margin-top: 6px;
+}
+
+/* Info box paragraphs lead with an icon, so align it to the first line
+   rather than letting it centre against a wrapped block. */
+.info-box p {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.info-box p .icon {
+  font-size: 15px;
+  margin-top: 1px;
+  color: #94a3b8;
 }
 
 /* Footer */

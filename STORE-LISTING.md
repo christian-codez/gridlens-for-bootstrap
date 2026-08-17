@@ -1,4 +1,4 @@
-# Store submission answers — GridLens for Bootstrap v1.4.0
+# Store submission answers — GridLens for Bootstrap v1.4.1
 
 Everything the Chrome and Firefox submission forms ask for, written out in advance.
 Copy from here into the forms rather than composing in the browser.

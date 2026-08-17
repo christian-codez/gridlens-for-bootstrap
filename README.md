@@ -136,7 +136,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.4.0
+1.4.1
 
 ## Packaging
 

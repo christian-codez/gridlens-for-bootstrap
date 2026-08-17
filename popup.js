@@ -210,16 +210,15 @@ function toggleGrid() {
 
 function updateGridToggleButton() {
   const button = document.getElementById('toggleGrid');
-  const icon = document.getElementById('toggleGridIcon');
+  // The icon no longer needs touching here - both states are in the DOM and
+  // CSS reveals the right one from the button's .active class.
   const text = document.getElementById('toggleGridText');
   
   if (isGridVisible) {
     button.classList.add('active');
-    icon.textContent = '◼';
     text.textContent = 'Hide Grid';
   } else {
     button.classList.remove('active');
-    icon.textContent = '◻';
     text.textContent = 'Show Grid';
   }
 }
