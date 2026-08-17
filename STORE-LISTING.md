@@ -1,4 +1,4 @@
-# Store submission answers — GridLens for Bootstrap v1.6.0
+# Store submission answers — GridLens for Bootstrap v1.6.1
 
 Everything the Chrome and Firefox submission forms ask for, written out in advance.
 Copy from here into the forms rather than composing in the browser.
@@ -251,16 +251,23 @@ $ ./package.sh
 
 errors     0
 notices    0
-warnings   2   (both explained in the reviewer notes above)
+warnings   1   (explained in the reviewer notes above)
 ```
 
-`package.sh` stages the shipped files, builds the zip, and lints the staged
-payload — so this validates exactly what you upload, not the working tree.
-Linting the working tree instead reports a spurious third warning for
-`package.sh` itself, which never ships.
+`package.sh` builds a separate zip per browser and lints the Firefox payload —
+so this validates exactly what AMO receives, not the working tree. Linting the
+working tree instead reports spurious warnings for `package.sh` itself and for
+Chrome-only manifest keys, none of which ship.
 
-Re-run before every upload. Errors block submission; these two warnings do not,
-and should stay at exactly two — a third means something new was introduced.
+**Upload the right zip to each store:**
+
+| Store | File |
+|---|---|
+| Chrome Web Store | `dist/gridlens-for-bootstrap-vX.Y.Z-chrome.zip` |
+| Firefox AMO | `dist/gridlens-for-bootstrap-vX.Y.Z-firefox.zip` |
+
+Re-run before every upload. Errors block submission; this warning does not, and
+should stay at exactly one — a second means something new was introduced.
 
 ---
 

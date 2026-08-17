@@ -74,16 +74,15 @@ cd gridlens-for-bootstrap
 3. Turn on **Developer mode** (top right)
 4. **Load unpacked** → select the project folder
 
-**Firefox**
-1. Go to `about:debugging#/runtime/this-firefox`
-2. **Load Temporary Add-on** → select `manifest.json`
-
-Or, with [`web-ext`](https://extensionworkshop.com/documentation/develop/web-ext-command-reference/):
+**Firefox** — needs the Firefox manifest, so build it first:
 
 ```sh
-npx web-ext run          # launches Firefox with the extension loaded
-npx web-ext lint         # the same validator AMO runs on upload
+./package.sh --no-lint
+npx web-ext run --source-dir dist/pkg-firefox
 ```
+
+Or go to `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** and
+select `dist/pkg-firefox/manifest.json`.
 
 Requires Chrome 111+ or Firefox 128+.
 
@@ -125,7 +124,8 @@ See [PRIVACY.md](PRIVACY.md).
 ## Project layout
 
 ```
-manifest.json        MV3 manifest; targets Chrome and Firefox from one file
+manifest.json        MV3 manifest, Chrome target
+manifest.firefox.json  Firefox-only manifest differences, merged at build time
 background.js        Toolbar badge; service worker on Chrome, event page on Firefox
 content.js           Grid overlay, tooltip and modal logic (isolated world)
 injected.js          Page-context helper (MAIN world) for Bootstrap instance APIs
@@ -138,7 +138,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.6.0
+1.6.1
 
 ## Icons
 
@@ -160,16 +160,27 @@ which is how the extension ended up half indigo and half teal after the rename.
 
 ## Packaging
 
-`./package.sh` builds the store submission zip into `dist/`, then lints it.
+`./package.sh` builds one zip per browser into `dist/`, then lints the Firefox
+one with the same validator AMO uses.
 
-Files are staged into `dist/pkg/` and zipped from there, so `manifest.json` is
-structurally guaranteed to sit at the zip root — both stores reject a zip of the
-containing folder. Only the files the extension ships are included; `docs/`,
-`demo/` and the tooling stay out.
+**Two manifests, on purpose.** Firefox has no background service worker support
+and needs `background.scripts`; Chrome warns that *"'background.scripts'
+requires manifest version of 2 or lower"*. A single manifest carrying both keys
+works everywhere but warns everywhere — on every unpacked load and in the AMO
+linter. The two stores are separate uploads anyway, so each gets a manifest with
+only the keys it understands.
 
-The lint runs against the staged payload rather than the working tree, so it
-validates exactly what gets uploaded. Expect 0 errors and 2 known warnings,
-both documented in `STORE-LISTING.md`.
+- `manifest.json` is the **Chrome** manifest, so loading this directory unpacked
+  in Chrome is warning-free.
+- `manifest.firefox.json` holds only the Firefox differences and is merged over
+  it at package time. A `null` value there removes the key.
+
+Files are staged into `dist/pkg-chrome/` and `dist/pkg-firefox/` and zipped from
+inside, so `manifest.json` is structurally guaranteed to sit at the zip root —
+both stores reject a zip of the containing folder. Only shipped files are
+included; `docs/`, `demo/` and the tooling stay out.
+
+Expect 0 errors and 1 known warning, documented in `STORE-LISTING.md`.
 
 ## License
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GridLens for Bootstrap",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Inspect Bootstrap layouts: grid overlay, live breakpoint readout, tooltip viewer, and modal opener.",
   "minimum_chrome_version": "111",
   "permissions": [
@@ -24,10 +24,7 @@
     "128": "icons/icon128.png"
   },
   "background": {
-    "service_worker": "background.js",
-    "scripts": [
-      "background.js"
-    ]
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -52,11 +49,5 @@
       "world": "MAIN",
       "run_at": "document_idle"
     }
-  ],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "gridlens@christian-codez.github.io",
-      "strict_min_version": "128.0"
-    }
-  }
+  ]
 }

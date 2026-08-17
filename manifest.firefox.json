@@ -1,0 +1,21 @@
+{
+  "__comment": [
+    "Firefox overrides, merged over manifest.json by package.sh.",
+    "Firefox has no background service worker support and needs background.scripts;",
+    "Chrome warns that background.scripts requires manifest v2 or lower. Shipping one",
+    "manifest to both therefore always warns somewhere, so each browser gets its own.",
+    "Keys set to null here are removed from the Firefox manifest."
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "gridlens@christian-codez.github.io",
+      "strict_min_version": "128.0"
+    }
+  },
+  "minimum_chrome_version": null
+}
