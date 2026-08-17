@@ -125,9 +125,32 @@ The declaration is yours to make and it carries legal weight, so if your
 circumstances are less clear-cut than this, that is a question for an accountant
 or a lawyer rather than a checklist.
 
-**Regardless of status:** the support email is shown publicly on the listing. Use
-a dedicated address rather than a primary personal one. The publishing Google
-account must also have 2-Step Verification enabled or it cannot publish at all.
+### Support contact — use the URL, not an email
+
+Neither store requires a support email. Chrome's listing takes a **Support URL**,
+and AMO accepts a support site in place of an address — it recommends an email as
+a minimum but does not demand one. So give the support page and no email:
+
+```
+https://christian-codez.github.io/gridlens-for-bootstrap/support/
+```
+
+That page routes to GitHub Issues, which is a better channel than email for a
+developer tool anyway: public, searchable, and threaded, so an answer helps the
+next person who hits the same thing.
+
+Do not use an address on a business domain here. It would not by itself make you
+a trader — the test is the purpose of the activity, not which domain appears in a
+form field — but it is displayed publicly, and it reconnects the extension to a
+business in one step on a listing that declares no commercial link. That is the
+weakest point to leave in the declaration, and it routes scraped spam into
+business mail for no gain.
+
+If a submission form turns out to insist on an address, use a dedicated one made
+for this and tied to neither you personally nor any business.
+
+**Regardless of status:** the publishing Google account must have 2-Step
+Verification enabled or it cannot publish at all.
 
 ## URLs
 
@@ -138,7 +161,7 @@ Both forms ask for these.
 | Homepage | `https://christian-codez.github.io/gridlens-for-bootstrap/` |
 | Privacy policy | `https://christian-codez.github.io/gridlens-for-bootstrap/privacy/` |
 | Support site | `https://christian-codez.github.io/gridlens-for-bootstrap/support/` |
-| Support email | *(a dedicated address — it is shown publicly on the listing)* |
+| Support email | *none — see below* |
 | Source repository | `https://github.com/christian-codez/gridlens-for-bootstrap` |
 
 ## Category
