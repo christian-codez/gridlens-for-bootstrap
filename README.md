@@ -21,9 +21,24 @@ otherwise mean digging through DevTools:
   uses, verified pixel-exact against Bootstrap 5.3 at every breakpoint
 - Switch between `.container` and `.container-fluid`
 - Live breakpoint readout (xs, sm, md, lg, xl, xxl) with the current viewport width
-- The active breakpoint also shows on the toolbar icon badge
+- The active breakpoint also shows on the toolbar icon badge, on any page that
+  uses Bootstrap — and stays out of the way on pages that don't
 - Custom overlay colour
 - Define your own breakpoints if your project overrides Bootstrap's
+
+### Version Detection
+Detection runs in the page's own JavaScript context, so it sees what the page
+actually loaded rather than guessing from markup. Four signals, strongest first:
+
+1. **JavaScript globals** — `window.bootstrap`, or the jQuery plugin
+   constructors used by Bootstrap 3 and 4. Yields an exact version, e.g. 5.3.3
+2. **CSS custom properties** — the `--bs-*` variables Bootstrap 5 sets on `:root`
+3. **Grid probe** — measures a throwaway row off-screen to recognise the grid on
+   pages that load Bootstrap's CSS but not its JavaScript
+4. **Markup conventions** — `data-bs-*` and `data-*` attributes
+
+Bootstrap often loads after the page does, so detection re-checks and updates
+when the answer changes.
 
 ### Tooltip Viewer
 - Show or hide every Bootstrap tooltip on the page at once
@@ -121,7 +136,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.3.0
+1.4.0
 
 ## Packaging
 

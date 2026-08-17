@@ -343,6 +343,20 @@ function resetBreakpoints() {
   });
 }
 
+const VERSION_NAMES = { 0: 'None detected', 3: 'Bootstrap 3', 4: 'Bootstrap 4', 5: 'Bootstrap 5' };
+
+// Detection now reaches the page's own globals, so an exact version string is
+// often available. Show it when we have it - "Bootstrap 5.3.3" tells you far
+// more than "Bootstrap 5", particularly when the grid looks wrong.
+function describeVersion(response) {
+  const name = VERSION_NAMES[response.version] || 'Unknown';
+  if (!response.version) return name;
+
+  const exact = response.exactVersion;
+  const label = exact ? `Bootstrap ${exact}` : name;
+  return response.isAuto ? `${label} (auto)` : `${label} (manual)`;
+}
+
 // ===== TOOLTIPS PANEL =====
 function setupTooltipsPanel() {
   document.getElementById('toggleTooltips').addEventListener('click', toggleTooltips);
@@ -382,10 +396,10 @@ function updateTooltipStatus() {
     
     countEl.textContent = response.count;
     
-    const versionMap = { 0: 'None/Custom', 3: 'Bootstrap 3', 4: 'Bootstrap 4', 5: 'Bootstrap 5' };
-    versionEl.textContent = response.isAuto ? 
-      `${versionMap[response.version]} (Auto)` : 
-      versionMap[response.version] || 'Unknown';
+    versionEl.textContent = describeVersion(response);
+    versionEl.title = response.detectionSource
+      ? `Detected from the page's ${response.detectionSource}`
+      : 'No Bootstrap detected on this page';
     
     if (response.visible) {
       statusEl.textContent = 'Visible';
@@ -461,8 +475,9 @@ function refreshModalsList() {
   sendMessageToTab({ action: 'getModals' }).then(response => {
     countEl.textContent = response.modals.length;
 
-    const versionMap = { 0: 'None', 3: 'Bootstrap 3', 4: 'Bootstrap 4', 5: 'Bootstrap 5' };
-    versionEl.textContent = versionMap[response.version] || 'Unknown';
+    versionEl.textContent = response.exactVersion
+      ? `Bootstrap ${response.exactVersion}`
+      : (VERSION_NAMES[response.version] || 'Unknown');
 
     if (response.modals.length === 0) {
       setSelectMessage(selectEl, '-- No modals found --');

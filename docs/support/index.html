@@ -74,6 +74,10 @@
 <p>Check the Bootstrap version in the Tooltips tab. Container widths and gutters differ between Bootstrap 3, 4, and 5, so the overlay follows the detected version. If detection guessed wrong — which happens on pages that load Bootstrap's CSS without its JavaScript — set the version manually and the overlay will redraw.</p>
 <p>Also confirm which container the section uses. A <code>.container-fluid</code> spans the full viewport while a <code>.container</code> is capped per breakpoint; switch <em>Container Type</em> in the Grid tab to match.</p>
 
+<h3>Why is there no breakpoint on the toolbar icon?</h3>
+<p>The badge appears on pages that use Bootstrap, and stays off everywhere else — a breakpoint label on a page with no Bootstrap grid would be meaningless, and badging every tab in the browser is noise.</p>
+<p>If a page does use Bootstrap and the badge is still missing, check the version readout in the Tooltips tab. Detection looks at the page's JavaScript globals, its <code>--bs-*</code> CSS variables, the grid itself, and finally its markup — so a page has to be hiding Bootstrap quite well to escape all four. Bootstrap loaded very late by a single-page app can take a few seconds to register.</p>
+
 <h3>Nothing happens on this page</h3>
 <p>The extension can't run on browser-internal pages — <code>chrome://</code>, <code>about:</code>, the Chrome Web Store, and Firefox's add-on gallery are all off limits to every extension, by browser policy rather than by choice. It also won't run on tabs that were already open when you installed it; reload those once.</p>
 
@@ -82,7 +86,7 @@
 <p>If you're on a version before 1.3.0, visibility was remembered globally and did follow you between sites. Updating fixes it.</p>
 
 <h3>Tooltips or modals don't respond</h3>
-<p>Confirm the page actually uses Bootstrap's JavaScript, not just its stylesheet. The Tooltips tab reports the detected version — if it shows "None/Custom", the page has no Bootstrap JS for the extension to drive, and only the fallback tooltip rendering is available.</p>
+<p>Confirm the page actually uses Bootstrap's JavaScript, not just its stylesheet. The Tooltips tab reports how Bootstrap was detected — hover the version readout. If it says the stylesheet or the markup rather than the JavaScript, the page has no Bootstrap JS for the extension to drive, so the grid overlay works but tooltips fall back to a simple renderer and modals may not open.</p>
 
 <h2>Reporting a bug</h2>
 <p>Include these and the fix will be much faster:</p>

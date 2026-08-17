@@ -1,4 +1,4 @@
-# Store submission answers — GridLens for Bootstrap v1.3.0
+# Store submission answers — GridLens for Bootstrap v1.4.0
 
 Everything the Chrome and Firefox submission forms ask for, written out in advance.
 Copy from here into the forms rather than composing in the browser.
@@ -45,6 +45,12 @@ the page uses - so it lines up with your actual columns instead of
 approximating them. Switch between .container and .container-fluid. Pick any
 overlay colour. A floating readout shows the active breakpoint and the current
 viewport width, updating live as you resize.
+
+VERSION DETECTION
+Detection runs in the page's own JavaScript context rather than guessing from
+markup, so it reports the exact version the page loaded - 5.3.3 rather than
+just "Bootstrap 5". It recognises pages that load Bootstrap's CSS without its
+JavaScript, and re-checks when Bootstrap arrives late.
 
 TOOLTIP VIEWER
 Reveal every Bootstrap tooltip on the page at once, instead of hovering each
@@ -193,6 +199,8 @@ filesystem, then:
                       breakpoint readout and container tier both track it.
                       "Container Type" switches to .container-fluid.
   2. Tooltips tab  -> "Show All Tooltips" reveals all five tooltips at once.
+                      The version readout should show the exact Bootstrap
+                      version the demo page loads.
   3. Modals tab    -> the dropdown lists three modals; picking one opens it.
 
 On permissions: the content script matches <all_urls> because a developer using

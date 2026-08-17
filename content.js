@@ -301,8 +301,19 @@
       );
     }
 
-    // Always update the toolbar badge so the current breakpoint shows on the icon
-    chrome.runtime.sendMessage({ action: 'updateBadge', breakpoint: current.name });
+    // The badge is passive - it appears on the toolbar icon whether or not the
+    // user asked for anything. So it shows only where it means something: a
+    // page that actually uses Bootstrap. Everywhere else it is cleared, rather
+    // than labelling every tab in the browser with a breakpoint that refers to
+    // no grid.
+    chrome.runtime
+      .sendMessage({
+        action: 'updateBadge',
+        breakpoint: pageUsesBootstrap() ? current.name : null
+      })
+      .catch(() => {
+        // Background asleep or mid-update; the badge is cosmetic.
+      });
   }
 
   // =============================================
@@ -336,25 +347,24 @@
     window.postMessage({ type: 'GRIDLENS_PING' }, '*');
   }
 
+  // Filled in by injected.js, which runs in the page's own world and can
+  // actually see window.bootstrap and the page's jQuery. Nothing here can:
+  // a `typeof bootstrap` check in an isolated content script always reads
+  // 'undefined', no matter what the page is running.
+  let detectedBootstrap = { version: 0, exact: null, source: null };
+
   function detectBootstrapVersion() {
-    const bs5Elements = document.querySelector('[data-bs-toggle="tooltip"], [data-bs-toggle="modal"]');
-    if (bs5Elements) return 5;
-    
-    if (typeof bootstrap !== 'undefined') return 5;
-    
-    if (typeof $ !== 'undefined' && $.fn && $.fn.tooltip) {
-      if ($.fn.tooltip.Constructor && $.fn.tooltip.Constructor.VERSION) {
-        const version = $.fn.tooltip.Constructor.VERSION;
-        if (version.startsWith('4')) return 4;
-        if (version.startsWith('3')) return 3;
-      }
-      return 4;
-    }
-    
-    const bs4Elements = document.querySelector('[data-toggle="tooltip"], [data-toggle="modal"]');
-    if (bs4Elements) return 4;
-    
+    if (detectedBootstrap.version) return detectedBootstrap.version;
+
+    // Stopgap for the moment before the page-world script reports in. Markup
+    // only - it is all this world can see without help.
+    if (document.querySelector('[data-bs-toggle],[data-bs-target],[data-bs-theme],[data-bs-dismiss]')) return 5;
+    if (document.querySelector('[data-toggle],[data-target],[data-dismiss]')) return 4;
     return 0;
+  }
+
+  function pageUsesBootstrap() {
+    return detectBootstrapVersion() > 0;
   }
 
   function getEffectiveVersion() {
@@ -576,6 +586,19 @@
     if (data.type === 'GRIDLENS_READY') {
       injectedScriptLoaded = true;
     }
+    else if (data.type === 'GRIDLENS_BOOTSTRAP_INFO' && data.info) {
+      const previous = detectedBootstrap.version;
+      detectedBootstrap = data.info;
+
+      // Bootstrap often loads after this script runs, so detection can change
+      // from "none" to a real version seconds in. Both things that depend on it
+      // have to catch up: the container geometry differs per major version, and
+      // the badge only shows on Bootstrap pages.
+      if (detectedBootstrap.version !== previous) {
+        applyGridGeometry();
+        updateBreakpointIndicator();
+      }
+    }
   });
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -624,6 +647,8 @@
         visible: tooltipsVisible,
         version: effectiveVersion,
         detectedVersion: detectedVersion,
+        exactVersion: detectedBootstrap.exact,
+        detectionSource: detectedBootstrap.source,
         isAuto: userSelectedVersion === 'auto'
       });
     } 
@@ -640,7 +665,8 @@
       const result = findAllModals();
       sendResponse({ 
         modals: result.modals.map(m => ({ id: m.id, title: m.title })),
-        version: result.version
+        version: result.version,
+        exactVersion: detectedBootstrap.exact
       });
     }
     else if (request.action === 'openModal') {
