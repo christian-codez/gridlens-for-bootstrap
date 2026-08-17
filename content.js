@@ -400,8 +400,19 @@
   // ordered relative to each other, so that broadcast can land before this
   // script attaches its listener. Sending a ping covers that race: whichever
   // arrives first sets the flag.
+  // Both worlds share this document, so the only correct target origin is this
+  // document's own. '*' worked but says "anywhere", which is not what is meant
+  // and is the sort of thing a reviewer stops on.
+  const PAGE_ORIGIN = window.location.origin && window.location.origin !== 'null'
+    ? window.location.origin
+    : '*';
+
+  function postToPage(message) {
+    window.postMessage(message, PAGE_ORIGIN);
+  }
+
   function pingPageScript() {
-    window.postMessage({ type: 'GRIDLENS_PING' }, '*');
+    postToPage({ type: 'GRIDLENS_PING' });
   }
 
   // Filled in by injected.js, which runs in the page's own world and can
@@ -485,8 +496,12 @@
       show() {
         document.body.appendChild(tooltipEl);
         const rect = element.getBoundingClientRect();
-        tooltipEl.style.left = rect.left + rect.width / 2 - tooltipEl.offsetWidth / 2 + 'px';
-        tooltipEl.style.top = rect.top - tooltipEl.offsetHeight - 5 + window.scrollY + 'px';
+        // position:absolute, so viewport-relative rect coordinates need the
+        // page scroll added on BOTH axes. Only the vertical one used to be,
+        // which put every tooltip in the wrong place on a horizontally
+        // scrolled page.
+        tooltipEl.style.left = rect.left + window.scrollX + rect.width / 2 - tooltipEl.offsetWidth / 2 + 'px';
+        tooltipEl.style.top = rect.top + window.scrollY - tooltipEl.offsetHeight - 5 + 'px';
       },
       hide() {
         if (tooltipEl.parentNode) tooltipEl.parentNode.removeChild(tooltipEl);
@@ -543,7 +558,7 @@
     }
 
     if (version === 5) {
-      window.postMessage({ type: 'GRIDLENS_SHOW_TOOLTIPS' }, '*');
+      postToPage({ type: 'GRIDLENS_SHOW_TOOLTIPS' });
       tooltipsVisible = true;
       activeTooltips = elements.map(el => ({ element: el, version: 5, usePageContext: true }));
     } else {
@@ -569,7 +584,7 @@
     const version = getEffectiveVersion();
     
     if (version === 5) {
-      window.postMessage({ type: 'GRIDLENS_HIDE_TOOLTIPS' }, '*');
+      postToPage({ type: 'GRIDLENS_HIDE_TOOLTIPS' });
     } else {
       activeTooltips.forEach(({ element, tooltip, version }) => {
         try {
@@ -621,11 +636,7 @@
     }
     
     // Send message to injected script to open modal in page context
-    window.postMessage({ 
-      type: 'GRIDLENS_OPEN_MODAL', 
-      modalId: modalId,
-      version: version
-    }, '*');
+    postToPage({ type: 'GRIDLENS_OPEN_MODAL', modalId: modalId });
     
     return { success: true };
   }
@@ -636,9 +647,10 @@
   
   window.addEventListener('message', function(event) {
     if (event.source !== window) return;
-    
+    if (PAGE_ORIGIN !== '*' && event.origin !== PAGE_ORIGIN) return;
+
     const data = event.data;
-    if (!data.type || !data.type.startsWith('GRIDLENS_')) return;
+    if (!data || typeof data.type !== 'string' || !data.type.startsWith('GRIDLENS_')) return;
     
     if (data.type === 'GRIDLENS_READY') {
       injectedScriptLoaded = true;
@@ -738,7 +750,10 @@
       sendResponse(result);
     }
     
-    return true;
+    // Every branch above answers synchronously. Returning true would tell the
+    // browser to hold the message channel open for a reply that never comes,
+    // leaving a port dangling for anything this listener does not handle.
+    return false;
   });
 
   // =============================================
@@ -762,22 +777,10 @@
     init();
   }
 
-  // Expose for debugging
-  window.bsToolkit = {
-    grid: {
-      toggle: toggleGrid,
-      isVisible: () => isGridVisible,
-      breakpoint: getCurrentBreakpoint
-    },
-    tooltips: {
-      show: showAllTooltips,
-      hide: hideAllTooltips,
-      count: () => findTooltipElements(getEffectiveVersion()).length
-    },
-    modals: {
-      list: findAllModals,
-      open: openModal
-    }
-  };
+  // No debug global is exposed. One used to be assigned here, but a content
+  // script's window is the isolated world - the devtools console evaluates in
+  // the page's world, so it was never reachable from where anyone would type
+  // it. Putting it in the page world instead would hand every site a scripted
+  // handle on the extension, which is a worse trade than not having it.
 
 })();

@@ -16,12 +16,27 @@
 (function() {
   'use strict';
 
+  // Both worlds share this document, so its own origin is the only correct
+  // target. This channel carries no privilege: everything reachable through it
+  // calls Bootstrap methods on the page's own components, which the page can
+  // already do directly. The guards are here because an unvalidated listener
+  // reads as untrusted-input handling, not because there is an escalation to
+  // prevent.
+  const PAGE_ORIGIN = window.location.origin && window.location.origin !== 'null'
+    ? window.location.origin
+    : '*';
+
+  function postToPage(message) {
+    window.postMessage(message, PAGE_ORIGIN);
+  }
+
   // Listen for messages from the content script
   window.addEventListener('message', function(event) {
     if (event.source !== window) return;
+    if (PAGE_ORIGIN !== '*' && event.origin !== PAGE_ORIGIN) return;
 
     const data = event.data;
-    if (!data || !data.type || !data.type.startsWith('GRIDLENS_')) return;
+    if (!data || typeof data.type !== 'string' || !data.type.startsWith('GRIDLENS_')) return;
 
     switch (data.type) {
       case 'GRIDLENS_PING':
@@ -38,13 +53,13 @@
         hideTooltips();
         break;
       case 'GRIDLENS_OPEN_MODAL':
-        openModal(data.modalId, data.version);
+        openModal(data.modalId);
         break;
     }
   });
 
   function announceReady() {
-    window.postMessage({ type: 'GRIDLENS_READY' }, '*');
+    postToPage({ type: 'GRIDLENS_READY' });
   }
 
   // ===== BOOTSTRAP DETECTION =====
@@ -175,7 +190,7 @@
     const signature = info.version + '|' + (info.exact || '') + '|' + (info.source || '');
     if (!force && signature === lastSignature) return;
     lastSignature = signature;
-    window.postMessage({ type: 'GRIDLENS_BOOTSTRAP_INFO', info: info }, '*');
+    postToPage({ type: 'GRIDLENS_BOOTSTRAP_INFO', info: info });
   }
 
   // Bootstrap frequently arrives after this script runs - async bundles,
@@ -217,10 +232,10 @@
       }
     });
     
-    window.postMessage({
+    postToPage({
       type: 'GRIDLENS_TOOLTIPS_SHOWN',
       count: shownCount
-    }, '*');
+    });
   }
 
   function hideTooltips() {
@@ -243,82 +258,162 @@
       }
     });
     
-    window.postMessage({
+    postToPage({
       type: 'GRIDLENS_TOOLTIPS_HIDDEN',
       count: hiddenCount
-    }, '*');
+    });
   }
 
   // ===== MODAL FUNCTIONS =====
 
-  function closeAllModals() {
-    // Find all modals on the page
-    const allModals = document.querySelectorAll('.modal');
-
-    allModals.forEach(function(modal) {
-      // Try Bootstrap 5
-      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        try {
-          const instance = bootstrap.Modal.getInstance(modal);
-          if (instance) {
-            instance.hide();
-          }
-        } catch (e) {
-          // Silent fail
-        }
+  // Returns the Bootstrap instance already managing this modal, whichever major
+  // version put it there, or null if the page has no Bootstrap JS driving it.
+  function modalInstanceFor(modal) {
+    try {
+      if (typeof bootstrap !== 'undefined' && bootstrap.Modal && bootstrap.Modal.getInstance) {
+        const instance = bootstrap.Modal.getInstance(modal);
+        if (instance) return { kind: 'bs5', instance: instance };
       }
+    } catch (e) { /* fall through */ }
 
-      // Try Bootstrap 4/3 with jQuery
+    try {
+      if (typeof Modal !== 'undefined' && Modal.getInstance) {
+        const instance = Modal.getInstance(modal);
+        if (instance) return { kind: 'bs5', instance: instance };
+      }
+    } catch (e) { /* fall through */ }
+
+    try {
       if (typeof $ !== 'undefined' && $.fn && $.fn.modal) {
-        try {
-          $(modal).modal('hide');
-        } catch (e) {
-          // Silent fail
-        }
+        const data = $(modal).data('bs.modal');
+        if (data) return { kind: 'jquery', instance: $(modal) };
       }
+    } catch (e) { /* fall through */ }
 
-      // Try standalone Modal class
-      if (typeof Modal !== 'undefined') {
-        try {
-          const instance = Modal.getInstance(modal);
-          if (instance) {
-            instance.hide();
-          }
-        } catch (e) {
-          // Silent fail
-        }
-      }
-
-      // Manual cleanup
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-    });
-
-    // Remove all backdrops
-    const backdrops = document.querySelectorAll('.modal-backdrop');
-    backdrops.forEach(function(backdrop) {
-      backdrop.remove();
-    });
-
-    // Remove modal-open class from body
-    document.body.classList.remove('modal-open');
+    return null;
   }
 
-  function openModal(modalId, version) {
-    const modalElement = document.getElementById(modalId);
+  function isOpen(modal) {
+    return modal.classList.contains('show') ||
+           modal.classList.contains('in') ||        // Bootstrap 3
+           modal.getAttribute('aria-modal') === 'true';
+  }
 
-    if (!modalElement) {
-      window.postMessage({
-        type: 'GRIDLENS_MODAL_ERROR',
-        error: 'Modal not found'
-      }, '*');
+  // Closes whatever is open and calls done() once the page has actually
+  // finished closing it.
+  //
+  // The previous version called hide() and then immediately force-wrote
+  // display:none, stripped .show, removed every backdrop and dropped
+  // body.modal-open. hide() is asynchronous - Bootstrap drives it through a CSS
+  // fade and cleans up in its own transition handler - so that raced its
+  // teardown. The visible results were an inline display:none stuck on a modal
+  // the page later tried to open itself, and a body left scroll-locked because
+  // Bootstrap re-added the class after we removed it.
+  //
+  // So: if the page is managing a modal, ask it to close and wait for its own
+  // "finished" event. Only modals with no instance at all get cleaned up by
+  // hand, because nothing else is going to do it.
+  function closeAllModals(done) {
+    const open = Array.from(document.querySelectorAll('.modal')).filter(isOpen);
+
+    if (!open.length) {
+      done();
       return;
     }
 
-    // Close all other modals first
-    closeAllModals();
+    let pending = 0;
+    let settled = false;
+    let forced = false;
 
+    function finish() {
+      if (settled) return;
+      settled = true;
+
+      // Deliberately does not force a Bootstrap-managed modal shut, even if it
+      // is somehow still open by now.
+      //
+      // Ripping the classes off one leaves Bootstrap's internal _isShown true,
+      // so every later show() on that modal returns early and the page can
+      // never open it again - a permanent break in exchange for tidying a
+      // transient one. Its teardown also runs afterwards and would strip the
+      // backdrop and body lock belonging to whichever modal we just opened.
+      //
+      // So if a close overruns, we proceed and let Bootstrap finish in its own
+      // time. Worst case is a brief second backdrop that clears itself.
+
+      // Clean up only after modals nothing on the page was managing: there is
+      // no instance coming along later to do it.
+      if (forced) {
+        document.querySelectorAll('.modal-backdrop').forEach(function (b) { b.remove(); });
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('padding-right');
+      }
+
+      done();
+    }
+
+    // Bootstrap's fade is 300ms. This only exists so a modal whose transition
+    // never fires cannot hang the open forever.
+    const guard = setTimeout(finish, 1500);
+
+    function settle() {
+      pending--;
+      if (pending <= 0) {
+        clearTimeout(guard);
+        finish();
+      }
+    }
+
+    open.forEach(function (modal) {
+      const found = modalInstanceFor(modal);
+
+      if (found) {
+        pending++;
+        modal.addEventListener('hidden.bs.modal', settle, { once: true });
+        try {
+          if (found.kind === 'jquery') found.instance.modal('hide');
+          else found.instance.hide();
+        } catch (e) {
+          modal.removeEventListener('hidden.bs.modal', settle);
+          settle();
+        }
+        return;
+      }
+
+      // No instance: nothing on the page owns this, so undo by hand what the
+      // fallback path in openModal did.
+      forced = true;
+      modal.classList.remove('show', 'in');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      modal.removeAttribute('aria-modal');
+    });
+
+    if (pending === 0) {
+      clearTimeout(guard);
+      finish();
+    }
+  }
+
+  function openModal(modalId) {
+    const modalElement = document.getElementById(modalId);
+
+    if (!modalElement) {
+      postToPage({
+        type: 'GRIDLENS_MODAL_ERROR',
+        error: 'Modal not found'
+    });
+      return;
+    }
+
+    // Wait for anything already open to finish closing. Opening on top of a
+    // half-torn-down modal is how you end up with two backdrops.
+    closeAllModals(function () {
+      showModal(modalElement, modalId);
+    });
+  }
+
+  function showModal(modalElement, modalId) {
     let success = false;
     
     // Try Bootstrap 5
@@ -381,11 +476,11 @@
       }
     }
     
-    window.postMessage({
+    postToPage({
       type: 'GRIDLENS_MODAL_OPENED',
       success: success,
       modalId: modalId
-    }, '*');
+    });
   }
 
   // Signal that the script is loaded. The isolated content script may not have

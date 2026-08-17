@@ -37,8 +37,11 @@ document.addEventListener('DOMContentLoaded', () => {
   setupCollapsibles();
   setupBreakpointIO();
   
-  // Update breakpoint every second
-  setInterval(updateCurrentBreakpoint, 1000);
+  // No polling. This used to message the content script once a second for as
+  // long as the popup was open, swallowing every rejection - so on a page with
+  // no content script it just showed "Error" forever with no reason given.
+  // The breakpoint is read once on open, and again only when something that
+  // could change it happens.
 });
 
 // Read the version from the manifest rather than hardcoding it in the footer,
@@ -94,6 +97,22 @@ async function getCurrentTab() {
 async function sendMessageToTab(message) {
   const tab = await getCurrentTab();
   return chrome.tabs.sendMessage(tab.id, message);
+}
+
+// chrome.storage.sync enforces write quotas - 120 a minute, 1800 an hour - and
+// reports going over through runtime.lastError. Nothing checked it, so a
+// rejected write looked exactly like a successful one.
+function saveSync(values, onSaved) {
+  chrome.storage.sync.set(values, () => {
+    if (chrome.runtime.lastError) {
+      const msg = chrome.runtime.lastError.message || '';
+      showStatus(/quota|QUOTA|MAX_WRITE/.test(msg)
+        ? 'Saving too fast — wait a moment and try again'
+        : 'Could not save settings', 'error');
+      return;
+    }
+    if (onSaved) onSaved();
+  });
 }
 
 function showStatus(message, type = 'success') {
@@ -190,7 +209,7 @@ function setContainerType(type) {
   containerType = type;
   updateContainerTypeButtons();
 
-  chrome.storage.sync.set({ containerType }, () => {
+  saveSync({ containerType }, () => {
     sendMessageToTab({ action: 'setContainerType', containerType })
       .catch(() => {});
   });
@@ -205,11 +224,60 @@ function updateContainerTypeButtons() {
   if (hint) hint.textContent = CONTAINER_HINTS[containerType] || '';
 }
 
-// Responsive Preview: Resize the current tab window
-function setTabWidth(width) {
-  chrome.windows.getCurrent({}, function(win) {
-    chrome.windows.update(win.id, { width: width, focused: true });
+// Responsive Preview
+//
+// Three things stopped this hitting the width on the button. A maximized window
+// ignores a width change unless it is taken out of that state first. Window
+// width is not viewport width - browser chrome and the scrollbar eat some of it,
+// so asking for 1200 left the page narrower than 1200 and reporting the wrong
+// breakpoint. And the OS enforces a minimum window width that is usually above
+// 375, so the narrowest button could not be honoured at all.
+//
+// So: drop out of maximized, measure the gap between window and viewport, then
+// correct for it. The button is honoured in terms of the viewport, which is what
+// a breakpoint is actually measured against.
+function setTabWidth(targetViewport) {
+  chrome.windows.getCurrent({}, function (win) {
+    if (chrome.runtime.lastError || !win) return;
+
+    const applyWidth = (w) => chrome.windows.update(win.id, { width: Math.round(w), focused: true });
+
+    const resize = () => {
+      sendMessageToTab({ action: 'getBreakpoint' }).then(response => {
+        const viewport = response && response.breakpoint && response.breakpoint.width;
+        // The difference between the window and the viewport it contains stays
+        // constant across a resize, so one measurement is enough to correct by.
+        const chromeWidth = (viewport && win.width) ? Math.max(0, win.width - viewport) : 0;
+        applyWidth(targetViewport + chromeWidth);
+        reportWidthOutcome(targetViewport, chromeWidth);
+      }).catch(() => {
+        applyWidth(targetViewport);
+      });
+    };
+
+    if (win.state === 'maximized' || win.state === 'fullscreen') {
+      chrome.windows.update(win.id, { state: 'normal' }, () => resize());
+    } else {
+      resize();
+    }
   });
+}
+
+// Says so when the OS refuses to make the window narrow enough, rather than
+// leaving a button that silently does nothing.
+function reportWidthOutcome(targetViewport, chromeWidth) {
+  setTimeout(() => {
+    sendMessageToTab({ action: 'getBreakpoint' }).then(response => {
+      const actual = response && response.breakpoint && response.breakpoint.width;
+      if (!actual) return;
+      if (Math.abs(actual - targetViewport) <= 2) {
+        showStatus('Viewport now ' + actual + 'px');
+      } else {
+        showStatus('Narrowest this window goes is ' + actual + 'px', 'error');
+      }
+      updateCurrentBreakpoint();
+    }).catch(() => {});
+  }, 220);
 }
 
 function toggleGrid() {
@@ -264,12 +332,17 @@ function updateCurrentBreakpoint() {
       document.getElementById('bp-name').textContent = response.breakpoint.name.toUpperCase();
       document.getElementById('bp-width').textContent = response.breakpoint.width + 'px';
     }
-  }).catch(() => {});
+  }).catch(() => {
+    // No content script here. Say which pages that means rather than leaving
+    // a dash and letting the user wonder whether it is broken.
+    document.getElementById('bp-name').textContent = 'N/A';
+    document.getElementById('bp-width').textContent = '—';
+  });
 }
 
 function updateGridColor(e) {
   gridColor = e.target.value;
-  chrome.storage.sync.set({ gridColor }, () => {
+  saveSync({ gridColor }, () => {
     sendMessageToTab({ action: 'updateColor', color: gridColor });
     showStatus('Grid color updated!');
   });
@@ -278,7 +351,7 @@ function updateGridColor(e) {
 function resetGridColor() {
   gridColor = '#ff0000';
   document.getElementById('gridColor').value = gridColor;
-  chrome.storage.sync.set({ gridColor }, () => {
+  saveSync({ gridColor }, () => {
     sendMessageToTab({ action: 'updateColor', color: gridColor });
     showStatus('Color reset to red');
   });
@@ -480,7 +553,7 @@ function saveBreakpoints() {
     .map(bp => ({ name: bp.name.trim(), minWidth: bp.minWidth }))
     .sort((a, b) => a.minWidth - b.minWidth);
 
-  chrome.storage.sync.set({ customBreakpoints }, () => {
+  saveSync({ customBreakpoints }, () => {
     renderBreakpoints();
     refreshJson();
     sendMessageToTab({ action: 'updateBreakpoints', breakpoints: customBreakpoints }).catch(() => {});
@@ -492,7 +565,7 @@ function resetBreakpoints() {
   customBreakpoints = cloneDefaults();
   // Storing an empty set means "no override", so the content script falls back
   // to its own defaults rather than to a copy that could drift from them.
-  chrome.storage.sync.set({ customBreakpoints: [] }, () => {
+  saveSync({ customBreakpoints: [] }, () => {
     renderBreakpoints();
     refreshJson();
     sendMessageToTab({ action: 'updateBreakpoints', breakpoints: [] }).catch(() => {});
@@ -633,7 +706,7 @@ function setupTooltipsPanel() {
   document.getElementById('toggleTooltips').addEventListener('click', toggleTooltips);
   document.getElementById('version-select').addEventListener('change', (e) => {
     const version = e.target.value;
-    chrome.storage.sync.set({ bootstrapVersion: version });
+    saveSync({ bootstrapVersion: version });
     sendMessageToTab({ action: 'setVersion', version }).then(() => {
       updateTooltipStatus();
       // An override can make the grid available on a page where nothing was
