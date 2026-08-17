@@ -177,6 +177,26 @@ header h1 {
   background: linear-gradient(135deg, var(--gl-accent-strong) 0%, var(--gl-accent-deep) 100%);
 }
 
+/* Explains a disabled Show Grid button. A control that does nothing with no
+   reason given is worse than one that is simply absent. */
+.grid-note {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--gl-muted);
+  margin: -8px 0 16px;
+}
+
+.btn-toggle:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  filter: grayscale(.35);
+}
+
+.btn-toggle:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 /* Breakpoint Display */
 .breakpoint-display {
   background: var(--gl-surface-2);

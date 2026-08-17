@@ -1,4 +1,4 @@
-# Store submission answers — GridLens for Bootstrap v1.5.0
+# Store submission answers — GridLens for Bootstrap v1.6.0
 
 Everything the Chrome and Firefox submission forms ask for, written out in advance.
 Copy from here into the forms rather than composing in the browser.
@@ -38,7 +38,9 @@ GridLens is a developer tool for building and debugging Bootstrap layouts. It pu
 three things a click away that otherwise mean digging through DevTools.
 
 GRID OVERLAY
-Draw the 12-column grid over any page and see exactly where your columns fall.
+Draw the 12-column grid over any Bootstrap page and see exactly where your
+columns fall. The overlay appears only where Bootstrap is actually in use, so
+it never follows you onto unrelated sites.
 The overlay reproduces Bootstrap's real container geometry - the correct
 max-width and gutter for each breakpoint, matched to whichever major version
 the page uses - so it lines up with your actual columns instead of

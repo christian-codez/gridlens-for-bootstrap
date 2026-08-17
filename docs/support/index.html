@@ -83,8 +83,14 @@
 <p>The extension can't run on browser-internal pages — <code>chrome://</code>, <code>about:</code>, the Chrome Web Store, and Firefox's add-on gallery are all off limits to every extension, by browser policy rather than by choice. It also won't run on tabs that were already open when you installed it; reload those once.</p>
 
 <h3>Does the grid follow me to other sites?</h3>
-<p>No. Grid visibility is per tab. Switching it on for the page you're working on leaves every other tab untouched, and new tabs always open clean. It survives reloading and navigating within that same tab — which is what you want while iterating on a layout — and clears when you close the tab or quit the browser.</p>
-<p>If you're on a version before 1.3.0, visibility was remembered globally and did follow you between sites. Updating fixes it.</p>
+<p>No, on two counts. Visibility is per tab, so switching it on for the page you're working on leaves every other tab untouched and new tabs open clean. And the overlay only draws on pages that actually use Bootstrap — navigate the same tab to a site with no Bootstrap and it disappears, then comes back by itself when you return, without you having to toggle it again.</p>
+<p>Before 1.3.0 visibility was remembered globally and followed you everywhere. Before 1.6.0 it stayed on within a tab regardless of what the next page was. Update if you're seeing either.</p>
+
+<h3>Show Grid is greyed out</h3>
+<p>No Bootstrap was detected on that page, so there's no grid to overlay. If you know Bootstrap is there — a heavily customised build, say — set the version manually in the Tooltips tab instead of leaving it on auto-detect, and the overlay will draw regardless.</p>
+
+<h3>Switching container type doesn't seem to change anything</h3>
+<p>Three things to check. Below 576px wide, <code>.container</code> is full-width anyway, so it and <code>.container-fluid</code> are genuinely identical — widen the window and the difference appears. The overlay also has to be switched on to see any change to it. And if you loaded the extension from source, reload it at <code>chrome://extensions</code> after updating; the version shown at the bottom of the popup tells you which build is actually running.</p>
 
 <h3>Tooltips or modals don't respond</h3>
 <p>Confirm the page actually uses Bootstrap's JavaScript, not just its stylesheet. The Tooltips tab reports how Bootstrap was detected — hover the version readout. If it says the stylesheet or the markup rather than the JavaScript, the page has no Bootstrap JS for the extension to drive, so the grid overlay works but tooltips fall back to a simple renderer and modals may not open.</p>

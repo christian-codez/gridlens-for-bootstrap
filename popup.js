@@ -15,6 +15,7 @@ let customBreakpoints = [];
 let isGridVisible = false;
 let gridColor = '#ff0000';
 let containerType = 'container';
+let gridAvailable = true;
 
 const CONTAINER_HINTS = {
   'container': 'Fixed max-width at each breakpoint.',
@@ -136,13 +137,14 @@ function loadTabGridState() {
   sendMessageToTab({ action: 'getGridState' }).then(response => {
     if (!response) return;
     isGridVisible = !!response.visible;
+    gridAvailable = response.available !== false;
     updateGridToggleButton();
   }).catch(() => {
     // No content script on this tab (a chrome:// page, the Web Store, a PDF,
-    // or a tab opened before the extension was installed). Leave the toggle in
-    // its default hidden state.
+    // or a tab opened before the extension was installed).
     isGridVisible = false;
-    updateGridToggleButton();
+    gridAvailable = false;
+    updateGridToggleButton('unsupported');
   });
 }
 
@@ -201,6 +203,7 @@ function toggleGrid() {
   sendMessageToTab({ action: 'toggleGrid' }).then(response => {
     if (response) {
       isGridVisible = response.visible;
+      gridAvailable = response.available !== false;
       updateGridToggleButton();
     }
   }).catch(err => {
@@ -208,18 +211,37 @@ function toggleGrid() {
   });
 }
 
-function updateGridToggleButton() {
+function updateGridToggleButton(reason) {
   const button = document.getElementById('toggleGrid');
   // The icon no longer needs touching here - both states are in the DOM and
   // CSS reveals the right one from the button's .active class.
   const text = document.getElementById('toggleGridText');
-  
+  const note = document.getElementById('grid-note');
+
   if (isGridVisible) {
     button.classList.add('active');
     text.textContent = 'Hide Grid';
   } else {
     button.classList.remove('active');
     text.textContent = 'Show Grid';
+  }
+
+  // The overlay only draws where a Bootstrap grid exists, so the control is
+  // disabled rather than silently doing nothing - and says why.
+  button.disabled = !gridAvailable;
+
+  if (gridAvailable) {
+    button.title = '';
+    note.hidden = true;
+    note.textContent = '';
+  } else if (reason === 'unsupported') {
+    button.title = 'GridLens cannot run on this page';
+    note.textContent = 'Not available here. Browser pages, the extension gallery and PDFs are off limits to every extension.';
+    note.hidden = false;
+  } else {
+    button.title = 'No Bootstrap detected on this page';
+    note.textContent = 'No Bootstrap found on this page, so there is no grid to overlay. Set the version manually in the Tooltips tab to draw one anyway.';
+    note.hidden = false;
   }
 }
 
@@ -364,7 +386,10 @@ function setupTooltipsPanel() {
     chrome.storage.sync.set({ bootstrapVersion: version });
     sendMessageToTab({ action: 'setVersion', version }).then(() => {
       updateTooltipStatus();
-    });
+      // An override can make the grid available on a page where nothing was
+      // detected, or withdraw it again.
+      loadTabGridState();
+    }).catch(() => {});
   });
   
   updateTooltipStatus();

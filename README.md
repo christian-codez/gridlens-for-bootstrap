@@ -14,6 +14,8 @@ otherwise mean digging through DevTools:
 ## Features
 
 ### Grid Overlay
+- Draws only on pages that use Bootstrap. Navigate away to an unrelated site
+  and the overlay disappears; come back and it returns, without re-toggling
 - Per-tab visibility — switching the grid on for the page you're working on
   leaves every other tab alone, and it clears when the tab closes
 - Toggle a 12-column grid overlay that matches Bootstrap's real container
@@ -136,7 +138,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.5.0
+1.6.0
 
 ## Icons
 

@@ -157,9 +157,33 @@
     updateBreakpointIndicator();
   }
 
+  // Whether drawing a Bootstrap grid on this page means anything.
+  //
+  // A manual version override is the user asserting how the page should be
+  // treated, so it beats detection. That is the escape hatch for a build whose
+  // Bootstrap has been compiled past recognition, or a hand-rolled 12-column
+  // grid the user still wants to measure.
+  function gridAvailable() {
+    if (userSelectedVersion !== 'auto') {
+      return parseInt(userSelectedVersion, 10) > 0;
+    }
+    return pageUsesBootstrap();
+  }
+
   function applyGridVisibility() {
-    if (gridOverlay) gridOverlay.style.display = isGridVisible ? 'block' : 'none';
-    if (breakpointIndicator) breakpointIndicator.style.display = isGridVisible ? 'block' : 'none';
+    // Rendering is gated on the page actually having Bootstrap, while the
+    // per-tab "on" state is kept either way.
+    //
+    // Visibility is remembered per tab so it survives a reload while you are
+    // working on a layout. But a tab is not one page: navigate that same tab to
+    // a site with no Bootstrap and the stored "on" used to paint a 12-column
+    // overlay and a floating breakpoint panel over a page that has no Bootstrap
+    // grid to compare them against. Gating the render, rather than clearing the
+    // state, means the overlay disappears on unrelated pages and comes back by
+    // itself when you return to the one you were working on.
+    const show = isGridVisible && gridAvailable();
+    if (gridOverlay) gridOverlay.style.display = show ? 'block' : 'none';
+    if (breakpointIndicator) breakpointIndicator.style.display = show ? 'block' : 'none';
   }
 
   // Preferences live in storage.sync - they belong to the user and should
@@ -330,8 +354,10 @@
       if (result.bootstrapVersion) {
         userSelectedVersion = result.bootstrapVersion;
         // The saved override may select a different Bootstrap version than the
-        // one detected, which changes the container widths the grid draws.
+        // one detected, which changes both the container widths the grid draws
+        // and whether the grid is offered on this page at all.
         applyGridGeometry();
+        applyGridVisibility();
       }
     });
   }
@@ -596,6 +622,9 @@
       // the badge only shows on Bootstrap pages.
       if (detectedBootstrap.version !== previous) {
         applyGridGeometry();
+        // Bootstrap arriving late can flip the grid from unavailable to
+        // available, so re-evaluate whether it should be on screen.
+        applyGridVisibility();
         updateBreakpointIndicator();
       }
     }
@@ -605,7 +634,7 @@
     // Grid actions
     if (request.action === 'toggleGrid') {
       toggleGrid();
-      sendResponse({ visible: isGridVisible });
+      sendResponse({ visible: isGridVisible, available: gridAvailable() });
     }
     else if (request.action === 'getBreakpoint') {
       sendResponse({ breakpoint: getCurrentBreakpoint() });
@@ -628,6 +657,7 @@
     else if (request.action === 'getGridState') {
       sendResponse({
         visible: isGridVisible,
+        available: gridAvailable(),
         breakpoint: getCurrentBreakpoint(),
         containerType: containerType
       });
@@ -655,9 +685,12 @@
     else if (request.action === 'setVersion') {
       userSelectedVersion = request.version;
       // Container widths and gutters differ per Bootstrap version, so the
-      // overlay has to be redrawn when the effective version changes.
+      // overlay has to be redrawn when the effective version changes - and an
+      // override can also make the grid available on a page where nothing was
+      // detected, or withdraw it.
       applyGridGeometry();
-      sendResponse({ success: true });
+      applyGridVisibility();
+      sendResponse({ success: true, available: gridAvailable() });
     }
     
     // Modal actions
