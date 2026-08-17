@@ -320,6 +320,20 @@ On the two validator warnings, both of which are intentional:
      There is an explanatory comment at that line in the source.
 ```
 
+### Deliberately not done: localisation
+
+The extension ships no `_locales` directory and sets no `default_locale`.
+
+With only an English locale that machinery changes nothing — not the interface,
+which shows the same strings either way, and not the store listing, which needs
+real translations to localise. What it does add is a runtime substitution step,
+markup that no longer reads as the text it renders, and a failure mode where one
+missing message key stops the extension loading at all.
+
+It is not a one-way door. Add `_locales/en/messages.json` and `default_locale`
+at the point there is a second language to put in it, and the work is the same
+size then as now.
+
 ### Validator status at time of writing
 
 ```
