@@ -1,7 +1,7 @@
-/* Bootstrap Toolkit - Content Styles */
+/* GridLens for Bootstrap - Content Styles */
 
 /* Grid Overlay */
-.bs-toolkit-grid-overlay {
+.gridlens-grid-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -12,64 +12,66 @@
   display: none;
 }
 
-.bs-toolkit-grid-container {
-  max-width: 1440px;
+/*
+ * Grid geometry mirrors Bootstrap's own box model.
+ *
+ * A .container is centred at its breakpoint max-width and pads itself by half a
+ * gutter each side. The .row inside cancels that padding with equal negative
+ * margins, so the row spans the container's full border box. That is why this
+ * element takes a max-width but no padding - it stands in for the row, not the
+ * container.
+ *
+ * max-width and --gridlens-gutter-half are set from content.js, because both
+ * depend on the Bootstrap version in use (3, 4, and 5 differ) and on whether
+ * the user is inspecting a .container or a .container-fluid. Media queries
+ * can't express that, so the breakpoint logic lives in GRID_SPECS instead.
+ */
+.gridlens-grid-container {
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
   height: 100%;
   display: flex;
-  padding: 0 1.5rem;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@media (min-width: 576px) {
-  .bs-toolkit-grid-container {
-    padding: 0 2rem;
-  }
+/*
+ * The column box: one twelfth of the row, padded by half a gutter each side
+ * exactly as a Bootstrap column is. flex-basis 0 with flex-grow 1 divides the
+ * row evenly regardless of content; min-width 0 stops flex's automatic minimum
+ * from widening columns on narrow viewports.
+ */
+.gridlens-grid-column {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0 var(--gridlens-gutter-half, 12px);
+  box-sizing: border-box;
 }
 
-@media (min-width: 768px) {
-  .bs-toolkit-grid-container {
-    padding: 0 3rem;
-  }
-}
-
-@media (min-width: 992px) {
-  .bs-toolkit-grid-container {
-    padding: 0 3rem;
-  }
-}
-
-@media (min-width: 1200px) {
-  .bs-toolkit-grid-container {
-    padding: 0 4rem;
-  }
-}
-
-@media (min-width: 1400px) {
-  .bs-toolkit-grid-container {
-    padding: 0 4rem;
-  }
-}
-
-.bs-toolkit-grid-column {
-  flex: 1;
+/*
+ * The painted band: the content area Bootstrap's column padding leaves behind.
+ * This is the edge developers align to, so this is what gets colour and borders
+ * (applied from content.js so the user's colour choice can override them).
+ */
+.gridlens-grid-column-inner {
+  height: 100%;
+  box-sizing: border-box;
   background: rgba(255, 0, 0, 0.1);
   border-left: 1px solid rgba(255, 0, 0, 0.3);
   border-right: 1px solid rgba(255, 0, 0, 0.3);
-  margin: 0 12px;
 }
 
-.bs-toolkit-grid-column:first-child {
+.gridlens-grid-column:first-child .gridlens-grid-column-inner {
   border-left: 2px solid rgba(255, 0, 0, 0.5);
-  margin-left: 0;
 }
 
-.bs-toolkit-grid-column:last-child {
+.gridlens-grid-column:last-child .gridlens-grid-column-inner {
   border-right: 2px solid rgba(255, 0, 0, 0.5);
-  margin-right: 0;
 }
 
 /* Breakpoint Indicator */
-.bs-toolkit-breakpoint-indicator {
+.gridlens-breakpoint-indicator {
   position: fixed;
   top: 20px;
   right: 20px;
@@ -86,7 +88,7 @@
   min-width: 150px;
 }
 
-.bs-toolkit-bp-name {
+.gridlens-bp-name {
   font-size: 18px;
   font-weight: bold;
   color: #00d4ff;
@@ -94,13 +96,13 @@
   letter-spacing: 1px;
 }
 
-.bs-toolkit-bp-width {
+.gridlens-bp-width {
   font-size: 16px;
   color: #00ff88;
   margin-bottom: 2px;
 }
 
-.bs-toolkit-bp-range {
+.gridlens-bp-range {
   font-size: 11px;
   color: #aaa;
   margin-top: 4px;
@@ -109,7 +111,7 @@
 }
 
 /* Custom Tooltip (fallback) */
-.bs-toolkit-custom-tooltip {
+.gridlens-custom-tooltip {
   position: absolute;
   background: rgba(0, 0, 0, 0.9);
   color: white;

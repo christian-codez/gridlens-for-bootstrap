@@ -1,28 +1,47 @@
-// Bootstrap Toolkit - Injected Script
-// Runs in page context to access Bootstrap instances
+// GridLens for Bootstrap - Page-context script
+//
+// Declared in the manifest as a content script with "world": "MAIN", so it runs
+// in the page's own execution environment and can reach Bootstrap's globals and
+// instance APIs (bootstrap.Modal, jQuery plugins) that the isolated content
+// script cannot see.
+//
+// This replaces the previous approach of appending a <script src> tag from
+// content.js, which any page with a restrictive script-src CSP would block -
+// silently breaking Bootstrap 5 tooltips and all modal opening on those sites.
+// Declarative MAIN-world injection is not subject to page CSP.
+//
+// Being in the MAIN world means no extension APIs are available here (no
+// chrome.*). Everything crosses to the isolated world via window.postMessage.
 
 (function() {
   'use strict';
 
-  // Listen for messages from content script
+  // Listen for messages from the content script
   window.addEventListener('message', function(event) {
     if (event.source !== window) return;
-    
+
     const data = event.data;
-    if (!data.type || !data.type.startsWith('BS_TOOLKIT_')) return;
-    
+    if (!data || !data.type || !data.type.startsWith('GRIDLENS_')) return;
+
     switch (data.type) {
-      case 'BS_TOOLKIT_SHOW_TOOLTIPS':
+      case 'GRIDLENS_PING':
+        announceReady();
+        break;
+      case 'GRIDLENS_SHOW_TOOLTIPS':
         showTooltips();
         break;
-      case 'BS_TOOLKIT_HIDE_TOOLTIPS':
+      case 'GRIDLENS_HIDE_TOOLTIPS':
         hideTooltips();
         break;
-      case 'BS_TOOLKIT_OPEN_MODAL':
+      case 'GRIDLENS_OPEN_MODAL':
         openModal(data.modalId, data.version);
         break;
     }
   });
+
+  function announceReady() {
+    window.postMessage({ type: 'GRIDLENS_READY' }, '*');
+  }
 
   // ===== TOOLTIP FUNCTIONS =====
   
@@ -55,7 +74,7 @@
     });
     
     window.postMessage({
-      type: 'BS_TOOLKIT_TOOLTIPS_SHOWN',
+      type: 'GRIDLENS_TOOLTIPS_SHOWN',
       count: shownCount
     }, '*');
   }
@@ -81,7 +100,7 @@
     });
     
     window.postMessage({
-      type: 'BS_TOOLKIT_TOOLTIPS_HIDDEN',
+      type: 'GRIDLENS_TOOLTIPS_HIDDEN',
       count: hiddenCount
     }, '*');
   }
@@ -147,7 +166,7 @@
 
     if (!modalElement) {
       window.postMessage({
-        type: 'BS_TOOLKIT_MODAL_ERROR',
+        type: 'GRIDLENS_MODAL_ERROR',
         error: 'Modal not found'
       }, '*');
       return;
@@ -219,15 +238,15 @@
     }
     
     window.postMessage({
-      type: 'BS_TOOLKIT_MODAL_OPENED',
+      type: 'GRIDLENS_MODAL_OPENED',
       success: success,
       modalId: modalId
     }, '*');
   }
 
-  // Signal that the script is loaded
-  window.postMessage({
-    type: 'BS_TOOLKIT_READY'
-  }, '*');
-  
+  // Signal that the script is loaded. The isolated content script may not have
+  // attached its listener yet when this fires, so it also sends GRIDLENS_PING
+  // on init and we answer that with the same announcement.
+  announceReady();
+
 })();

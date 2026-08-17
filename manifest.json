@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "Bootstrap Toolkit",
-  "version": "1.0.0",
-  "description": "All-in-one Bootstrap developer toolkit: Grid Overlay, Tooltip Viewer, and Modal Opener",
+  "name": "GridLens for Bootstrap",
+  "version": "1.2.0",
+  "description": "Inspect Bootstrap layouts: grid overlay, live breakpoint readout, tooltip viewer, and modal opener.",
+  "minimum_chrome_version": "111",
   "permissions": [
     "activeTab",
-    "storage",
-    "scripting"
+    "storage"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -24,7 +24,8 @@
     "128": "icons/icon128.png"
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
   },
   "content_scripts": [
     {
@@ -32,12 +33,18 @@
       "js": ["content.js"],
       "css": ["styles.css"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["injected.js"],
+      "world": "MAIN",
+      "run_at": "document_idle"
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": ["injected.js"],
-      "matches": ["<all_urls>"]
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "gridlens@christian-codez.github.io",
+      "strict_min_version": "128.0"
     }
-  ]
+  }
 }

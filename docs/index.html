@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GridLens for Bootstrap</title>
+<meta name="description" content="A browser extension for building and debugging Bootstrap layouts: pixel-accurate grid overlay, live breakpoint readout, tooltip viewer, and modal opener.">
+<style>
+  :root {
+    --bg: #f1f4f3; --surface: #fff; --surface-2: #e9eeed;
+    --ink: #101e1c; --ink-2: #354744; --muted: #61736f;
+    --rule: #d3ddda; --accent: #0b6e6b; --accent-wash: #dceae8; --on-accent: #fff;
+    --ok: #37702f; --ok-wash: #e4efe0;
+    --font-body: Charter, "Bitstream Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1514; --surface: #151f1e; --surface-2: #1c2827;
+      --ink: #e3ebe9; --ink-2: #c0cecb; --muted: #8aa09c;
+      --rule: #273634; --accent: #4cb8b1; --accent-wash: #13302e; --on-accent: #0d1514;
+      --ok: #85be79; --ok-wash: #1a2a17;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 20px 90px; background: var(--bg); color: var(--ink);
+    font: 17px/1.62 var(--font-body); -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 47rem; margin: 0 auto; }
+
+  header { padding: 64px 0 30px; border-bottom: 2px solid var(--ink); }
+  .eyebrow {
+    font: 700 11px/1.4 var(--font-mono); letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
+  }
+  h1 {
+    font-size: clamp(2.1rem, 6vw, 3rem); line-height: 1.06; margin: 0 0 14px;
+    font-weight: 600; letter-spacing: -.02em; text-wrap: balance;
+  }
+  .standfirst { font-size: 1.15rem; color: var(--ink-2); margin: 0; max-width: 38rem; text-wrap: pretty; }
+
+  .disclaimer {
+    margin-top: 20px; font-size: .82rem; color: var(--muted); font-style: italic;
+  }
+
+  h2 {
+    font-size: 1.45rem; font-weight: 600; margin: 52px 0 12px;
+    padding-bottom: 9px; border-bottom: 1px solid var(--rule); text-wrap: balance;
+  }
+  p { margin: 0 0 1em; text-wrap: pretty; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  code {
+    font: .85em var(--font-mono); background: var(--surface-2);
+    padding: .12em .38em; border-radius: 2px;
+  }
+
+  .features { display: grid; gap: 12px; grid-template-columns: 1fr; margin-top: 22px; }
+  @media (min-width: 38rem) { .features { grid-template-columns: 1fr 1fr; } }
+  .feat {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 3px;
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .feat h3 { font: 600 1.05rem/1.35 var(--font-body); margin: 0; }
+  .feat p { margin: 0; font-size: .92rem; color: var(--ink-2); }
+
+  .badge {
+    display: inline-block; font: 700 10px/1.4 var(--font-mono);
+    letter-spacing: .08em; text-transform: uppercase;
+    background: var(--ok-wash); color: var(--ok);
+    padding: 3px 7px; border-radius: 2px; margin-bottom: 4px; align-self: flex-start;
+  }
+
+  pre {
+    font: 12.5px/1.6 var(--font-mono); background: var(--surface);
+    border: 1px solid var(--rule); border-left: 3px solid var(--accent);
+    border-radius: 2px; padding: 15px 17px; overflow-x: auto; margin: 0 0 18px;
+  }
+  pre code { background: none; padding: 0; }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 26rem; font-size: .93rem; }
+  th, td { text-align: left; padding: 10px 15px; border-bottom: 1px solid var(--rule); }
+  thead th {
+    font: 700 .7rem/1.4 var(--font-ui); letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .btn {
+    font: 600 .92rem/1 var(--font-ui); text-decoration: none;
+    padding: 11px 18px; border-radius: 4px; border: 1px solid var(--accent);
+    color: var(--accent); background: transparent; transition: background .15s, color .15s;
+  }
+  .btn:hover { background: var(--accent-wash); }
+  .btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  .btn-primary:hover { filter: brightness(1.08); }
+
+  .note {
+    background: var(--accent-wash); border-left: 3px solid var(--accent);
+    border-radius: 0 3px 3px 0; padding: 14px 18px; margin: 0 0 20px;
+    font-size: .94rem; color: var(--ink-2);
+  }
+
+  footer {
+    margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule);
+    font: 12px/1.7 var(--font-mono); color: var(--muted);
+  }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="eyebrow">Browser extension · Chrome &amp; Firefox</div>
+  <h1>GridLens for Bootstrap</h1>
+  <p class="standfirst">Overlay the real Bootstrap grid, watch the breakpoint change as you resize, reveal every tooltip at once, and open any modal — including the ones with no trigger button.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="https://github.com/christian-codez/gridlens-for-bootstrap">Source on GitHub</a>
+    <a class="btn" href="privacy/">Privacy policy</a>
+    <a class="btn" href="support/">Support</a>
+  </div>
+  <p class="disclaimer">An independent project. Not affiliated with, endorsed by, or sponsored by the Bootstrap project or its maintainers. "Bootstrap" is used only to describe what the tool inspects.</p>
+</header>
+
+<h2>What it does</h2>
+<div class="features">
+  <div class="feat">
+    <span class="badge">Pixel-exact</span>
+    <h3>Grid overlay</h3>
+    <p>Reproduces Bootstrap's actual container geometry — correct max-width and gutter for each breakpoint, matched to whichever major version the page uses. Switch between <code>.container</code> and <code>.container-fluid</code>.</p>
+  </div>
+  <div class="feat">
+    <h3>Breakpoint readout</h3>
+    <p>A floating panel showing the active breakpoint and viewport width, updating live as you resize. The breakpoint also appears on the toolbar icon badge.</p>
+  </div>
+  <div class="feat">
+    <h3>Tooltip viewer</h3>
+    <p>Reveal every Bootstrap tooltip on the page at once, instead of hovering each element one at a time to check copy, positioning, and overflow.</p>
+  </div>
+  <div class="feat">
+    <h3>Modal opener</h3>
+    <p>Lists every modal in the DOM and opens the one you pick — no hunting for the trigger, no faking application state to reach it.</p>
+  </div>
+</div>
+
+<h2>The grid actually lines up</h2>
+<p>Most grid overlays draw twelve evenly spaced bars and call it done. Bootstrap's real geometry is more particular: the container is capped at a specific max-width per breakpoint, the row cancels the container's padding with negative margins, and each column carries half a gutter of padding. Miss any of that and the overlay sits a few pixels off your actual columns — close enough to look right, wrong enough to mislead.</p>
+<p>GridLens reproduces the box model instead of approximating it, and follows the page's Bootstrap version, since 3, 4, and 5 use different container widths and different gutters. It's verified against real Bootstrap 5.3.3 across every container tier:</p>
+
+<div class="table-scroll">
+<table>
+  <thead><tr><th>Viewport</th><th>Container tier</th><th>Max deviation</th></tr></thead>
+  <tbody>
+    <tr><td>575px</td><td>fluid</td><td>0.03px</td></tr>
+    <tr><td>576px</td><td>540px</td><td>0.00px</td></tr>
+    <tr><td>768px</td><td>720px</td><td>0.00px</td></tr>
+    <tr><td>992px</td><td>960px</td><td>0.09px</td></tr>
+    <tr><td>1200px</td><td>1140px</td><td>0.00px</td></tr>
+    <tr><td>1400px</td><td>1320px</td><td>0.00px</td></tr>
+  </tbody>
+</table>
+</div>
+<p style="margin-top:1em"><small>Worst deviation across eighteen tested widths: 0.09px — sub-pixel, from Bootstrap's percentage widths versus flex division. Both land on the same rendered pixel.</small></p>
+
+<h2>Install</h2>
+<div class="note">Not yet published to either store. Until then, load it from source — it takes about a minute.</div>
+
+<p><strong>Chrome</strong> — clone the repo, open <code>chrome://extensions/</code>, turn on Developer mode, then <em>Load unpacked</em> and select the project folder.</p>
+
+<p><strong>Firefox</strong> — open <code>about:debugging#/runtime/this-firefox</code>, then <em>Load Temporary Add-on</em> and select <code>manifest.json</code>.</p>
+
+<pre><code>git clone https://github.com/christian-codez/gridlens-for-bootstrap.git
+cd gridlens-for-bootstrap
+npx web-ext run          # launches Firefox with it loaded</code></pre>
+
+<p>Requires Chrome 111+ or Firefox 128+. There's a demo page at <code>demo/index.html</code> with a grid, five tooltips, and three modals to try it against.</p>
+
+<h2>Privacy</h2>
+<p>GridLens collects nothing. No analytics, no telemetry, no accounts, no servers, no remote code. Five preferences live in your browser's own extension storage and nowhere else. The <a href="privacy/">full policy</a> spells out exactly what is stored and why each permission is requested.</p>
+
+<footer>
+  MIT licensed · <a href="https://github.com/christian-codez/gridlens-for-bootstrap">github.com/christian-codez/gridlens-for-bootstrap</a><br>
+  Bootstrap is a trademark of its respective owners. GridLens is an independent, unaffiliated project.
+</footer>
+
+</main>
+</body>
+</html>

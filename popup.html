@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bootstrap Toolkit</title>
+  <title>GridLens for Bootstrap</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>🛠️ Bootstrap Toolkit</h1>
+      <h1>🔍 GridLens</h1>
       <p class="subtitle">Grid • Tooltips • Modals</p>
     </header>
 
@@ -58,6 +58,15 @@
             <button class="responsive-btn" data-width="1400" data-label="xxl">XXL</button>
           </div>
           <div class="responsive-note" style="font-size:11px;color:#888;margin-top:4px;">Resize the page to Bootstrap breakpoints</div>
+        </div>
+
+        <div class="settings-section">
+          <h3>Container Type</h3>
+          <div class="container-type-group" role="group" aria-label="Container type">
+            <button class="container-type-btn active" data-container="container">.container</button>
+            <button class="container-type-btn" data-container="container-fluid">.container-fluid</button>
+          </div>
+          <p class="help-text" id="container-hint">Fixed max-width at each breakpoint.</p>
         </div>
 
         <div class="settings-section">
@@ -165,7 +174,8 @@
     </section>
 
     <footer>
-      <p>Bootstrap Toolkit v1.0.0</p>
+      <p>GridLens for Bootstrap v1.1.0</p>
+      <p class="disclaimer">Not affiliated with or endorsed by the Bootstrap project.</p>
     </footer>
   </div>
 

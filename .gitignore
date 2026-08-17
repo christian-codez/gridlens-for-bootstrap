@@ -1,0 +1,17 @@
+# Build output
+dist/
+*.zip
+*.xpi
+
+# Dependencies (none currently; web-ext is run via npx)
+node_modules/
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# web-ext scratch
+.web-extension-id
+web-ext-artifacts/

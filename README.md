@@ -1,71 +1,115 @@
-# Bootstrap Toolkit
+# GridLens for Bootstrap
 
-An all-in-one Chrome extension for Bootstrap developers. Combines three powerful tools:
+A browser extension for building and debugging Bootstrap layouts. Three tools that
+otherwise mean digging through DevTools:
 
-1. **📐 Grid Overlay** - Visualize the Bootstrap 12-column grid
-2. **💬 Tooltip Viewer** - Show all tooltips on a page at once
-3. **🗔 Modal Opener** - Open any Bootstrap modal by ID
+1. **📐 Grid Overlay** — draw the 12-column grid over any page
+2. **💬 Tooltip Viewer** — reveal every tooltip at once
+3. **🗔 Modal Opener** — open any modal on the page, including ones with no trigger
+
+> GridLens is an independent project. It is **not affiliated with, endorsed by, or
+> sponsored by the Bootstrap project** or its maintainers. "Bootstrap" is used here
+> only to describe what the tool inspects.
 
 ## Features
 
 ### Grid Overlay
-- Toggle a 12-column grid overlay on any webpage
-- See the current Bootstrap breakpoint (xs, sm, md, lg, xl, xxl)
-- Customize grid color
-- Define custom breakpoints
+- Toggle a 12-column grid overlay that matches Bootstrap's real container
+  geometry - correct max-widths and gutters for whichever major version the page
+  uses, verified pixel-exact against Bootstrap 5.3 at every breakpoint
+- Switch between `.container` and `.container-fluid`
+- Live breakpoint readout (xs, sm, md, lg, xl, xxl) with the current viewport width
+- The active breakpoint also shows on the toolbar icon badge
+- Custom overlay colour
+- Define your own breakpoints if your project overrides Bootstrap's
 
 ### Tooltip Viewer
-- Show/hide all Bootstrap tooltips at once
-- Auto-detect Bootstrap version (3, 4, or 5)
-- Manual version override option
-- Works with jQuery and vanilla Bootstrap
+- Show or hide every Bootstrap tooltip on the page at once
+- Auto-detects Bootstrap 3, 4, or 5
+- Manual version override when detection guesses wrong
+- Works with both jQuery-based and vanilla Bootstrap
 
 ### Modal Opener
-- Open any Bootstrap modal by entering its ID
-- See a list of all detected modals on the page
-- Click any modal in the list to open it
+- Scans the page and lists every modal it finds
+- Pick one from the dropdown and open it — no trigger button needed
 - Works with Bootstrap 3, 4, and 5
 
-## Installation
+## Install
 
-### Chrome (Developer Mode)
-1. Download or clone this repository
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable "Developer mode" (toggle in top right)
-4. Click "Load unpacked"
-5. Select the `bootstrap-toolkit` folder
+Not yet published to either store. To run it from source:
+
+**Chrome**
+1. Clone or download this repository
+2. Go to `chrome://extensions/`
+3. Turn on **Developer mode** (top right)
+4. **Load unpacked** → select the project folder
+
+**Firefox**
+1. Go to `about:debugging#/runtime/this-firefox`
+2. **Load Temporary Add-on** → select `manifest.json`
+
+Or, with [`web-ext`](https://extensionworkshop.com/documentation/develop/web-ext-command-reference/):
+
+```sh
+npx web-ext run          # launches Firefox with the extension loaded
+npx web-ext lint         # the same validator AMO runs on upload
+```
+
+Requires Chrome 111+ or Firefox 128+.
 
 ## Usage
 
-1. Click the Bootstrap Toolkit icon in your browser toolbar
-2. Use the tabs to switch between Grid, Tooltips, and Modals features
-3. Each panel has its own controls and settings
+Click the GridLens icon in the toolbar, then pick a tab.
 
-### Grid Panel
-- Click "Show Grid" to toggle the grid overlay
-- Change the overlay color using the color picker
-- Add custom breakpoints in the collapsible section
+**Grid** — *Show Grid* toggles the overlay. *Container Type* switches between
+`.container` (fixed max-width per breakpoint) and `.container-fluid` (full
+width). The colour picker changes the overlay colour. Expand *Custom
+Breakpoints* to define your own.
 
-### Tooltips Panel
-- Select Bootstrap version or use auto-detect
-- Click "Show All Tooltips" to display all tooltips
+**Tooltips** — choose a Bootstrap version or leave it on auto-detect, then
+*Show All Tooltips*.
 
-### Modals Panel
-- Enter a modal ID (with or without #) and click "Open"
-- Or click any detected modal in the list to open it
-- Click "Refresh List" to rescan for modals
+**Modals** — the dropdown lists every modal found on the page. Select one and click
+*Open Selected Modal*. *Refresh Modal List* rescans after the page changes.
+
+## Try it
+
+`demo/index.html` is a Bootstrap 5 page exercising all three features, including a
+modal with no trigger button. Open it locally and work through the three tabs.
 
 ## Compatibility
 
-- Bootstrap 3.x
-- Bootstrap 4.x
-- Bootstrap 5.x
-- Works with jQuery-based and vanilla JS Bootstrap implementations
+| | |
+|---|---|
+| Bootstrap | 3.x, 4.x, 5.x |
+| Chrome | 111+ |
+| Firefox | 128+ |
+| Loading | jQuery-based and vanilla JS builds |
+
+## Privacy
+
+GridLens collects nothing. No analytics, no telemetry, no accounts, no servers.
+Four settings live in your browser's extension storage and nowhere else.
+See [PRIVACY.md](PRIVACY.md).
+
+## Project layout
+
+```
+manifest.json        MV3 manifest; targets Chrome and Firefox from one file
+background.js        Toolbar badge; service worker on Chrome, event page on Firefox
+content.js           Grid overlay, tooltip and modal logic (isolated world)
+injected.js          Page-context helper (MAIN world) for Bootstrap instance APIs
+popup.html/.js/.css  Extension popup
+styles.css           Overlay and indicator styles injected into pages
+demo/index.html      Test fixture and screenshot surface
+docs/privacy.html    Privacy policy, ready for GitHub Pages
+STORE-LISTING.md     Pre-written answers for both store submission forms
+```
 
 ## Version
 
-1.0.0
+1.2.0
 
 ## License
 
-MIT License
+[MIT](LICENSE)

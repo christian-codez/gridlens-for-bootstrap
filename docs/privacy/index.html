@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — GridLens for Bootstrap</title>
+<style>
+  :root {
+    --bg: #f1f4f3; --surface: #fff; --ink: #101e1c; --ink-2: #354744;
+    --muted: #61736f; --rule: #d3ddda; --accent: #0b6e6b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1514; --surface: #151f1e; --ink: #e3ebe9; --ink-2: #c0cecb;
+      --muted: #8aa09c; --rule: #273634; --accent: #4cb8b1;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 20px 80px; background: var(--bg); color: var(--ink);
+    font: 17px/1.62 Charter, "Iowan Old Style", Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 44rem; margin: 0 auto; }
+  header { padding: 56px 0 24px; border-bottom: 2px solid var(--ink); }
+  h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.1; margin: 0 0 8px; font-weight: 600; }
+  .updated {
+    font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  }
+  .crumb {
+    font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .crumb a { color: var(--muted); }
+  h2 {
+    font-size: 1.35rem; font-weight: 600; margin: 44px 0 10px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--rule);
+  }
+  p { margin: 0 0 1em; text-wrap: pretty; }
+  ul { padding-left: 1.2rem; }
+  li { margin-bottom: .4em; color: var(--ink-2); }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  code {
+    font: .85em ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: var(--rule); padding: .12em .38em; border-radius: 2px;
+  }
+  .lede {
+    background: var(--surface); border-left: 3px solid var(--accent);
+    padding: 16px 20px; margin: 24px 0 0; color: var(--ink-2);
+  }
+  .table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 28rem; font-size: .94rem; }
+  th, td { text-align: left; padding: 10px 15px; border-bottom: 1px solid var(--rule); }
+  thead th {
+    font: 700 .7rem/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  footer {
+    margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--rule);
+    font-size: .85rem; color: var(--muted); font-style: italic;
+  }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="crumb"><a href="../">GridLens for Bootstrap</a> · Privacy</div>
+  <h1>Privacy Policy</h1>
+  <div class="updated">GridLens for Bootstrap · Last updated 16 August 2026</div>
+</header>
+
+<p class="lede">GridLens does not collect, transmit, store, or sell any personal data. There is no analytics, no telemetry, no error reporting, no advertising, and no remote server of any kind. Nothing the extension sees ever leaves your browser.</p>
+
+<h2>What the extension can access</h2>
+<p>GridLens runs on the pages you visit in order to do its job — drawing a grid overlay, finding tooltip elements, and listing Bootstrap modals requires reading the structure of the page in front of you.</p>
+<p>This reading happens entirely inside your browser, in memory, while the page is open. Page content is never copied, retained, logged, or sent anywhere. When you close or navigate away from a page, nothing about it is kept.</p>
+
+<h2>What the extension stores</h2>
+<p>GridLens saves five preferences using your browser's built-in extension storage:</p>
+<div class="table-scroll">
+<table>
+  <thead><tr><th>Setting</th><th>What it holds</th></tr></thead>
+  <tbody>
+    <tr><td><code>gridColor</code></td><td>The overlay colour you picked</td></tr>
+    <tr><td><code>customBreakpoints</code></td><td>Any custom breakpoint names and widths you defined</td></tr>
+    <tr><td><code>gridVisible</code></td><td>Whether the grid overlay is currently switched on</td></tr>
+    <tr><td><code>bootstrapVersion</code></td><td>Your Bootstrap version override, or <code>auto</code></td></tr>
+    <tr><td><code>containerType</code></td><td>Whether the overlay draws a <code>.container</code> or <code>.container-fluid</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p style="margin-top:1em">These are stored through the browser's <code>storage.sync</code> API. If you are signed in to Chrome or Firefox with sync enabled, your browser may sync these five values across your own devices, in the same way it syncs your bookmarks. That transfer is handled by your browser under its own privacy policy — the extension author has no access to it and operates no server that could receive it.</p>
+<p>You can erase all of it at any time by removing the extension, or by using the reset buttons in the extension's popup.</p>
+
+<h2>What the extension does not do</h2>
+<ul>
+  <li>No data is sent to the developer or to any third party.</li>
+  <li>No accounts, sign-in, or identifiers of any kind.</li>
+  <li>No cookies are read or written.</li>
+  <li>No browsing history, URLs, form input, passwords, or page text is collected.</li>
+  <li>No code is downloaded or executed from a remote source. Everything that runs ships inside the reviewed extension package.</li>
+</ul>
+
+<h2>Permissions, and why each is needed</h2>
+<p><strong><code>storage</code></strong> — to save the five preferences listed above so they survive a browser restart.</p>
+<p><strong><code>activeTab</code></strong> — so the popup can talk to the current tab when you click the toolbar icon. Granted only for the tab you are looking at, only while you are using the extension.</p>
+<p><strong>Access to all websites</strong> (declared through the content script's <code>&lt;all_urls&gt;</code> match pattern) — GridLens is a developer tool for inspecting Bootstrap layouts, and the developer using it may be working on any site: localhost, a staging server, a client's production domain. The extension cannot know in advance which sites those will be, so it must be able to run wherever you are building. It uses this access solely to draw the overlay and locate Bootstrap components on the page you have open.</p>
+
+<h2>Children</h2>
+<p>GridLens is a software development tool with no content directed at children and collects no data from anyone, including children.</p>
+
+<h2>Changes</h2>
+<p>If this policy ever changes, the revision will be published at this URL and the "last updated" date above will change. Because the extension collects nothing, any change would be a clarification rather than a new use of data.</p>
+
+<h2>Contact</h2>
+<p>Questions about this policy: <a href="https://github.com/christian-codez/gridlens-for-bootstrap/issues">open an issue on GitHub</a>, or see the <a href="../support/">support page</a>.</p>
+
+<footer>GridLens is an independent project. It is not affiliated with, endorsed by, or sponsored by the Bootstrap project or its maintainers. "Bootstrap" is used only to describe what the tool inspects.</footer>
+
+</main>
+</body>
+</html>

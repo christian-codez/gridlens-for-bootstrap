@@ -1,4 +1,4 @@
-/* Bootstrap Toolkit Popup Styles */
+/* GridLens for Bootstrap - Popup Styles */
 
 * {
   margin: 0;
@@ -531,6 +531,46 @@ header h1 {
   padding: 10px;
 }
 
+/* Container Type Switch */
+.container-type-group {
+  display: flex;
+  gap: 6px;
+}
+
+.container-type-btn {
+  flex: 1;
+  padding: 7px 8px;
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+
+.container-type-btn:hover {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.container-type-btn.active {
+  background: #0b6e6b;
+  border-color: #0b6e6b;
+  color: #fff;
+}
+
+.container-type-btn:focus-visible {
+  outline: 2px solid #0b6e6b;
+  outline-offset: 1px;
+}
+
+#container-hint {
+  margin-top: 6px;
+}
+
 /* Footer */
 footer {
   background: #f8fafc;
@@ -543,6 +583,14 @@ footer p {
   font-size: 11px;
   color: #94a3b8;
   font-weight: 500;
+  margin: 0;
+}
+
+footer .disclaimer {
+  font-size: 10px;
+  font-weight: 400;
+  color: #a8b4c4;
+  margin-top: 3px;
 }
 
 /* Status Messages */

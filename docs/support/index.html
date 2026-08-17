@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support — GridLens for Bootstrap</title>
+<meta name="description" content="Help, troubleshooting, and bug reports for the GridLens for Bootstrap browser extension.">
+<style>
+  :root {
+    --bg: #f1f4f3; --surface: #fff; --surface-2: #e9eeed;
+    --ink: #101e1c; --ink-2: #354744; --muted: #61736f;
+    --rule: #d3ddda; --accent: #0b6e6b; --accent-wash: #dceae8; --on-accent: #fff;
+    --font-body: Charter, "Bitstream Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1514; --surface: #151f1e; --surface-2: #1c2827;
+      --ink: #e3ebe9; --ink-2: #c0cecb; --muted: #8aa09c;
+      --rule: #273634; --accent: #4cb8b1; --accent-wash: #13302e; --on-accent: #0d1514;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0 20px 90px; background: var(--bg); color: var(--ink);
+    font: 17px/1.62 var(--font-body); -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 45rem; margin: 0 auto; }
+  header { padding: 56px 0 24px; border-bottom: 2px solid var(--ink); }
+  h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.08; margin: 0 0 8px; font-weight: 600; }
+  .crumb { font: 11px/1.4 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .crumb a { color: var(--muted); }
+  h2 {
+    font-size: 1.35rem; font-weight: 600; margin: 44px 0 10px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--rule);
+  }
+  h3 { font: 600 1.05rem/1.4 var(--font-body); margin: 26px 0 6px; }
+  p { margin: 0 0 1em; text-wrap: pretty; }
+  ul { padding-left: 1.2rem; } li { margin-bottom: .45em; color: var(--ink-2); }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  code { font: .85em var(--font-mono); background: var(--surface-2); padding: .12em .38em; border-radius: 2px; }
+  .lede { background: var(--surface); border-left: 3px solid var(--accent); padding: 16px 20px; margin: 24px 0 0; color: var(--ink-2); }
+  .btn {
+    display: inline-block; font: 600 .92rem/1 var(--font-ui); text-decoration: none;
+    padding: 11px 18px; border-radius: 4px; background: var(--accent); color: var(--on-accent);
+    margin-top: 8px;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  footer {
+    margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--rule);
+    font: 12px/1.7 var(--font-mono); color: var(--muted);
+  }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="crumb"><a href="../">GridLens for Bootstrap</a> · Support</div>
+  <h1>Support</h1>
+</header>
+
+<p class="lede">The fastest way to get help is to open an issue on GitHub. Bug reports, feature requests, and questions all go to the same place, and you'll get a faster answer there than by email.</p>
+
+<p><a class="btn" href="https://github.com/christian-codez/gridlens-for-bootstrap/issues">Open an issue on GitHub</a></p>
+
+<h2>Before you file</h2>
+<p>A few things resolve most reports on their own.</p>
+
+<h3>The grid doesn't line up with my columns</h3>
+<p>Check the Bootstrap version in the Tooltips tab. Container widths and gutters differ between Bootstrap 3, 4, and 5, so the overlay follows the detected version. If detection guessed wrong — which happens on pages that load Bootstrap's CSS without its JavaScript — set the version manually and the overlay will redraw.</p>
+<p>Also confirm which container the section uses. A <code>.container-fluid</code> spans the full viewport while a <code>.container</code> is capped per breakpoint; switch <em>Container Type</em> in the Grid tab to match.</p>
+
+<h3>Nothing happens on this page</h3>
+<p>The extension can't run on browser-internal pages — <code>chrome://</code>, <code>about:</code>, the Chrome Web Store, and Firefox's add-on gallery are all off limits to every extension, by browser policy rather than by choice. It also won't run on tabs that were already open when you installed it; reload those once.</p>
+
+<h3>The grid is showing on sites I didn't ask for</h3>
+<p>Grid visibility is currently remembered globally rather than per tab, so leaving it on means it appears on pages you open afterwards. Toggle it off in the popup. This is a known rough edge and is being changed to per-tab state.</p>
+
+<h3>Tooltips or modals don't respond</h3>
+<p>Confirm the page actually uses Bootstrap's JavaScript, not just its stylesheet. The Tooltips tab reports the detected version — if it shows "None/Custom", the page has no Bootstrap JS for the extension to drive, and only the fallback tooltip rendering is available.</p>
+
+<h2>Reporting a bug</h2>
+<p>Include these and the fix will be much faster:</p>
+<ul>
+  <li>Browser and version, and your operating system</li>
+  <li>The Bootstrap version the page uses, and what the extension reported</li>
+  <li>A URL that reproduces it, or the relevant markup — a CodePen is ideal</li>
+  <li>What you expected versus what happened</li>
+  <li>Anything logged in the browser console</li>
+</ul>
+
+<h2>Privacy and data</h2>
+<p>GridLens collects nothing, sends nothing, and has no server — so there's no account, no stored history, and nothing for anyone to delete on your behalf. Removing the extension removes everything it saved. See the <a href="../privacy/">privacy policy</a> for the specifics.</p>
+
+<h2>Source code</h2>
+<p>GridLens is MIT licensed and the full source is on <a href="https://github.com/christian-codez/gridlens-for-bootstrap">GitHub</a>. Nothing is minified or bundled, so what you read in the repository is exactly what runs in your browser.</p>
+
+<footer>
+  MIT licensed · <a href="https://github.com/christian-codez/gridlens-for-bootstrap">github.com/christian-codez/gridlens-for-bootstrap</a><br>
+  An independent project, not affiliated with or endorsed by the Bootstrap project.
+</footer>
+
+</main>
+</body>
+</html>

@@ -1,4 +1,4 @@
-// Bootstrap Toolkit - Content Script
+// GridLens for Bootstrap - Content Script
 // Combines Grid Overlay, Tooltip Viewer, and Modal Opener functionality
 
 (function() {
@@ -17,11 +17,60 @@
     { name: 'xxl', minWidth: 1400, maxWidth: Infinity }
   ];
 
+  // Bootstrap's real container geometry, per major version.
+  //
+  // `width` is the .container max-width at that minimum viewport width (null
+  // means fluid - 100% of the viewport). `gutter` is the full --bs-gutter-x;
+  // each column carries half of it as padding on each side.
+  //
+  // These differ meaningfully between versions: Bootstrap 3 has entirely
+  // different container widths and no 576px or 1400px tier, and 3 and 4 both
+  // use a 30px gutter where 5 uses 24px. Drawing a v5 grid over a v4 page is
+  // exactly the kind of near-miss that makes an overlay untrustworthy.
+  //
+  // Ordered widest-first so the first match wins.
+  const GRID_SPECS = {
+    3: {
+      gutter: 30,
+      containers: [
+        { min: 1200, width: 1170 },
+        { min: 992,  width: 970 },
+        { min: 768,  width: 750 },
+        { min: 0,    width: null }
+      ]
+    },
+    4: {
+      gutter: 30,
+      containers: [
+        { min: 1200, width: 1140 },
+        { min: 992,  width: 960 },
+        { min: 768,  width: 720 },
+        { min: 576,  width: 540 },
+        { min: 0,    width: null }
+      ]
+    },
+    5: {
+      gutter: 24,
+      containers: [
+        { min: 1400, width: 1320 },
+        { min: 1200, width: 1140 },
+        { min: 992,  width: 960 },
+        { min: 768,  width: 720 },
+        { min: 576,  width: 540 },
+        { min: 0,    width: null }
+      ]
+    }
+  };
+
+  const GRID_COLUMN_COUNT = 12;
+
   let gridOverlay = null;
+  let gridContainer = null;
   let breakpointIndicator = null;
   let customBreakpoints = [];
   let isGridVisible = false;
   let gridColor = '#ff0000';
+  let containerType = 'container';
 
   function hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -34,27 +83,83 @@
 
   function applyGridColor() {
     if (!gridOverlay) return;
-    
-    const columns = gridOverlay.querySelectorAll('.bs-toolkit-grid-column');
+
+    // The inner element is the column's content box - the area Bootstrap's own
+    // column padding leaves for content. That is the edge developers align to,
+    // so it is what gets painted, not the full column box.
+    const bands = gridOverlay.querySelectorAll('.gridlens-grid-column-inner');
     const rgb = hexToRgb(gridColor);
-    
-    columns.forEach((column, index) => {
-      column.style.setProperty('background', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`, 'important');
-      column.style.setProperty('border-left', `1px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`, 'important');
-      column.style.setProperty('border-right', `1px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`, 'important');
-      
+
+    bands.forEach((band, index) => {
+      band.style.setProperty('background', `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`, 'important');
+      band.style.setProperty('border-left', `1px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`, 'important');
+      band.style.setProperty('border-right', `1px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`, 'important');
+
       if (index === 0) {
-        column.style.setProperty('border-left', `2px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`, 'important');
+        band.style.setProperty('border-left', `2px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`, 'important');
       }
-      if (index === columns.length - 1) {
-        column.style.setProperty('border-right', `2px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`, 'important');
+      if (index === bands.length - 1) {
+        band.style.setProperty('border-right', `2px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`, 'important');
       }
     });
   }
 
+  // Which spec to draw. Follows the user's version override when they've set
+  // one, otherwise what was detected on the page. Falls back to 5 for pages
+  // with no detectable Bootstrap, since that's the current release.
+  function activeGridSpec() {
+    const version = getEffectiveVersion();
+    return GRID_SPECS[version] || GRID_SPECS[5];
+  }
+
+  // Tier selection goes through matchMedia rather than comparing a number
+  // against window.innerWidth, because the two can disagree.
+  //
+  // Bootstrap picks its container width with a CSS media query. Whether the
+  // browser measures that query's width including or excluding the vertical
+  // scrollbar varies by engine - Chrome tracks window.innerWidth, Gecko has
+  // historically used the scrollbar-excluded width. Comparing innerWidth
+  // ourselves would put the overlay one tier off inside a scrollbar's width of
+  // every breakpoint, on whichever engine disagrees.
+  //
+  // Asking the same media query Bootstrap uses removes the question: whatever
+  // basis the browser applies, we get the identical answer. This also stays
+  // correct under page zoom and with overlay scrollbars.
+  function currentContainerWidth(spec) {
+    if (containerType === 'container-fluid') return null;
+
+    for (const tier of spec.containers) {
+      if (tier.min === 0) return tier.width;
+      if (window.matchMedia('(min-width: ' + tier.min + 'px)').matches) return tier.width;
+    }
+    return null;
+  }
+
+  // Reproduces Bootstrap's box model rather than approximating it.
+  //
+  // A .container is centred at its breakpoint max-width and carries half a
+  // gutter of padding each side. The .row inside cancels that with equal
+  // negative margins, so the row spans the container's full border box - which
+  // is why this element has a max-width but no padding. Each column then pads
+  // itself by half a gutter, so the painted band sits inset from the column box.
+  function applyGridGeometry() {
+    if (!gridContainer) return;
+
+    const spec = activeGridSpec();
+    const width = currentContainerWidth(spec);
+
+    gridContainer.style.setProperty('--gridlens-gutter-half', (spec.gutter / 2) + 'px');
+    gridContainer.style.setProperty('max-width', width === null ? 'none' : width + 'px', 'important');
+  }
+
+  function onViewportResize() {
+    applyGridGeometry();
+    updateBreakpointIndicator();
+  }
+
   function loadGridSettings() {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(['customBreakpoints', 'gridVisible', 'gridColor'], (result) => {
+      chrome.storage.sync.get(['customBreakpoints', 'gridVisible', 'gridColor', 'containerType'], (result) => {
         if (result.customBreakpoints) {
           customBreakpoints = result.customBreakpoints;
         }
@@ -64,10 +169,16 @@
         if (result.gridColor) {
           gridColor = result.gridColor;
         }
+        if (result.containerType) {
+          containerType = result.containerType;
+        }
         // After settings are loaded and possibly after overlay/indicator are created, update their display
         if (gridOverlay) gridOverlay.style.display = isGridVisible ? 'block' : 'none';
         if (breakpointIndicator) breakpointIndicator.style.display = isGridVisible ? 'block' : 'none';
-        if (gridOverlay) applyGridColor();
+        if (gridOverlay) {
+          applyGridGeometry();
+          applyGridColor();
+        }
 
         resolve();
       });
@@ -75,36 +186,45 @@
   }
 
   function createGridOverlay() {
-    const existing = document.getElementById('bs-toolkit-grid-overlay');
+    const existing = document.getElementById('gridlens-grid-overlay');
     if (existing) existing.remove();
 
     gridOverlay = document.createElement('div');
-    gridOverlay.id = 'bs-toolkit-grid-overlay';
-    gridOverlay.className = 'bs-toolkit-grid-overlay';
-    
-    const container = document.createElement('div');
-    container.className = 'bs-toolkit-grid-container';
-    
-    for (let i = 0; i < 12; i++) {
+    gridOverlay.id = 'gridlens-grid-overlay';
+    gridOverlay.className = 'gridlens-grid-overlay';
+
+    gridContainer = document.createElement('div');
+    gridContainer.className = 'gridlens-grid-container';
+
+    for (let i = 0; i < GRID_COLUMN_COUNT; i++) {
       const column = document.createElement('div');
-      column.className = 'bs-toolkit-grid-column';
-      container.appendChild(column);
+      column.className = 'gridlens-grid-column';
+
+      // Outer element is the column box; inner is the content area left by
+      // Bootstrap's column padding. Painting the inner one puts the visible
+      // edges exactly where a developer's content starts.
+      const band = document.createElement('div');
+      band.className = 'gridlens-grid-column-inner';
+
+      column.appendChild(band);
+      gridContainer.appendChild(column);
     }
-    
-    gridOverlay.appendChild(container);
+
+    gridOverlay.appendChild(gridContainer);
     document.body.appendChild(gridOverlay);
-    
+
+    applyGridGeometry();
     applyGridColor();
     // Don't set display here; let loadGridSettings handle it after async load
   }
 
   function createBreakpointIndicator() {
-    const existing = document.getElementById('bs-toolkit-breakpoint-indicator');
+    const existing = document.getElementById('gridlens-breakpoint-indicator');
     if (existing) existing.remove();
 
     breakpointIndicator = document.createElement('div');
-    breakpointIndicator.id = 'bs-toolkit-breakpoint-indicator';
-    breakpointIndicator.className = 'bs-toolkit-breakpoint-indicator';
+    breakpointIndicator.id = 'gridlens-breakpoint-indicator';
+    breakpointIndicator.className = 'gridlens-breakpoint-indicator';
     document.body.appendChild(breakpointIndicator);
     // Don't set display here; let loadGridSettings handle it after async load
   }
@@ -139,15 +259,24 @@
     return { name: 'unknown', width: width, range: 'N/A' };
   }
 
+  function makeIndicatorRow(className, text) {
+    const row = document.createElement('div');
+    row.className = className;
+    row.textContent = text;
+    return row;
+  }
+
   function updateBreakpointIndicator() {
     const current = getCurrentBreakpoint();
 
     if (breakpointIndicator) {
-      breakpointIndicator.innerHTML = `
-        <div class="bs-toolkit-bp-name">${current.name.toUpperCase()}</div>
-        <div class="bs-toolkit-bp-width">${current.width}px</div>
-        <div class="bs-toolkit-bp-range">${current.range}</div>
-      `;
+      // Breakpoint names are user-supplied via the popup, so build these with
+      // textContent rather than an innerHTML template.
+      breakpointIndicator.replaceChildren(
+        makeIndicatorRow('gridlens-bp-name', current.name.toUpperCase()),
+        makeIndicatorRow('gridlens-bp-width', current.width + 'px'),
+        makeIndicatorRow('gridlens-bp-range', current.range)
+      );
     }
 
     // Always update the toolbar badge so the current breakpoint shows on the icon
@@ -167,20 +296,22 @@
     chrome.storage.sync.get(['bootstrapVersion'], (result) => {
       if (result.bootstrapVersion) {
         userSelectedVersion = result.bootstrapVersion;
+        // The saved override may select a different Bootstrap version than the
+        // one detected, which changes the container widths the grid draws.
+        applyGridGeometry();
       }
     });
   }
 
-  function injectPageScript() {
-    if (injectedScriptLoaded) return;
-    
-    const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('injected.js');
-    script.onload = function() {
-      injectedScriptLoaded = true;
-      this.remove();
-    };
-    (document.head || document.documentElement).appendChild(script);
+  // injected.js is declared in the manifest as a MAIN-world content script, so
+  // it is already present - nothing to inject. We only confirm it is listening.
+  //
+  // It broadcasts GRIDLENS_READY on load, but the two worlds' scripts are not
+  // ordered relative to each other, so that broadcast can land before this
+  // script attaches its listener. Sending a ping covers that race: whichever
+  // arrives first sets the flag.
+  function pingPageScript() {
+    window.postMessage({ type: 'GRIDLENS_PING' }, '*');
   }
 
   function detectBootstrapVersion() {
@@ -227,8 +358,20 @@
 
   function createCustomTooltip(element, title) {
     const tooltipEl = document.createElement('div');
-    tooltipEl.className = 'bs-toolkit-custom-tooltip';
+    tooltipEl.className = 'gridlens-custom-tooltip';
     
+    // REVIEWER NOTE - the one intentional innerHTML in this extension.
+    //
+    // Bootstrap's own tooltip renders its title as HTML when the author opts in
+    // via data-bs-html="true" (data-html in Bootstrap 3/4). This fallback path
+    // exists to reproduce what the page would render on hover, so it has to
+    // honour the same opt-in or it would misreport the page's real output.
+    //
+    // The content is the page's own markup, already under that page's control
+    // and already rendered by Bootstrap itself when Bootstrap is present. No
+    // extension data, user input, or cross-origin content reaches this line, and
+    // it runs in the isolated content-script world, not in the extension's
+    // privileged pages. Without the opt-in, the title is set as plain text.
     const allowHtml = element.getAttribute('data-bs-html') === 'true' || element.getAttribute('data-html') === 'true';
     if (allowHtml) {
       tooltipEl.innerHTML = title;
@@ -311,7 +454,7 @@
     }
 
     if (version === 5) {
-      window.postMessage({ type: 'BS_TOOLKIT_SHOW_TOOLTIPS' }, '*');
+      window.postMessage({ type: 'GRIDLENS_SHOW_TOOLTIPS' }, '*');
       tooltipsVisible = true;
       activeTooltips = elements.map(el => ({ element: el, version: 5, usePageContext: true }));
     } else {
@@ -337,7 +480,7 @@
     const version = getEffectiveVersion();
     
     if (version === 5) {
-      window.postMessage({ type: 'BS_TOOLKIT_HIDE_TOOLTIPS' }, '*');
+      window.postMessage({ type: 'GRIDLENS_HIDE_TOOLTIPS' }, '*');
     } else {
       activeTooltips.forEach(({ element, tooltip, version }) => {
         try {
@@ -390,7 +533,7 @@
     
     // Send message to injected script to open modal in page context
     window.postMessage({ 
-      type: 'BS_TOOLKIT_OPEN_MODAL', 
+      type: 'GRIDLENS_OPEN_MODAL', 
       modalId: modalId,
       version: version
     }, '*');
@@ -406,9 +549,9 @@
     if (event.source !== window) return;
     
     const data = event.data;
-    if (!data.type || !data.type.startsWith('BS_TOOLKIT_')) return;
+    if (!data.type || !data.type.startsWith('GRIDLENS_')) return;
     
-    if (data.type === 'BS_TOOLKIT_READY') {
+    if (data.type === 'GRIDLENS_READY') {
       injectedScriptLoaded = true;
     }
   });
@@ -432,8 +575,17 @@
       applyGridColor();
       sendResponse({ success: true });
     }
+    else if (request.action === 'setContainerType') {
+      containerType = request.containerType;
+      applyGridGeometry();
+      sendResponse({ success: true, containerType });
+    }
     else if (request.action === 'getGridState') {
-      sendResponse({ visible: isGridVisible, breakpoint: getCurrentBreakpoint() });
+      sendResponse({
+        visible: isGridVisible,
+        breakpoint: getCurrentBreakpoint(),
+        containerType: containerType
+      });
     }
 
     // Tooltip actions
@@ -455,6 +607,9 @@
     } 
     else if (request.action === 'setVersion') {
       userSelectedVersion = request.version;
+      // Container widths and gutters differ per Bootstrap version, so the
+      // overlay has to be redrawn when the effective version changes.
+      applyGridGeometry();
       sendResponse({ success: true });
     }
     
@@ -484,9 +639,9 @@
     await loadGridSettings();
     loadTooltipSettings();
     updateBreakpointIndicator();
-    injectPageScript();
+    pingPageScript();
 
-    window.addEventListener('resize', updateBreakpointIndicator);
+    window.addEventListener('resize', onViewportResize);
   }
 
   if (document.readyState === 'loading') {

@@ -1,4 +1,4 @@
-// Bootstrap Toolkit Popup Script
+// GridLens for Bootstrap - Popup Script
 
 // ===== Constants =====
 const DEFAULT_BREAKPOINTS = [
@@ -14,6 +14,12 @@ const DEFAULT_BREAKPOINTS = [
 let customBreakpoints = [];
 let isGridVisible = false;
 let gridColor = '#ff0000';
+let containerType = 'container';
+
+const CONTAINER_HINTS = {
+  'container': 'Fixed max-width at each breakpoint.',
+  'container-fluid': 'Full viewport width at every breakpoint.'
+};
 
 // ===== Initialize =====
 document.addEventListener('DOMContentLoaded', () => {
@@ -90,7 +96,12 @@ function showStatus(message, type = 'success') {
 
 // ===== Settings =====
 function loadSettings() {
-  chrome.storage.sync.get(['customBreakpoints', 'gridVisible', 'gridColor', 'bootstrapVersion'], (result) => {
+  chrome.storage.sync.get(['customBreakpoints', 'gridVisible', 'gridColor', 'bootstrapVersion', 'containerType'], (result) => {
+    if (result.containerType) {
+      containerType = result.containerType;
+    }
+    updateContainerTypeButtons();
+
     if (result.customBreakpoints && result.customBreakpoints.length > 0) {
       customBreakpoints = result.customBreakpoints;
       renderBreakpoints();
@@ -129,7 +140,31 @@ function setupGridPanel() {
     });
   });
 
+  // Container type switch
+  document.querySelectorAll('.container-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => setContainerType(btn.dataset.container));
+  });
+
   updateCurrentBreakpoint();
+}
+
+function setContainerType(type) {
+  containerType = type;
+  updateContainerTypeButtons();
+
+  chrome.storage.sync.set({ containerType }, () => {
+    sendMessageToTab({ action: 'setContainerType', containerType })
+      .catch(() => {});
+  });
+}
+
+function updateContainerTypeButtons() {
+  document.querySelectorAll('.container-type-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.container === containerType);
+  });
+
+  const hint = document.getElementById('container-hint');
+  if (hint) hint.textContent = CONTAINER_HINTS[containerType] || '';
 }
 
 // Responsive Preview: Resize the current tab window
@@ -192,21 +227,43 @@ function resetGridColor() {
   });
 }
 
+function makeBreakpointInput(type, placeholder, value, index, field) {
+  const input = document.createElement('input');
+  input.type = type;
+  input.placeholder = placeholder;
+  input.value = value;
+  input.dataset.index = String(index);
+  input.dataset.field = field;
+  return input;
+}
+
 function renderBreakpoints() {
   const container = document.getElementById('breakpointsList');
-  container.innerHTML = '';
+  container.replaceChildren();
   
   customBreakpoints.forEach((bp, index) => {
     const item = document.createElement('div');
     item.className = 'breakpoint-item';
-    item.innerHTML = `
-      <div class="breakpoint-inputs">
-        <input type="text" placeholder="Name" value="${bp.name}" data-index="${index}" data-field="name">
-        <input type="number" placeholder="Min (px)" value="${bp.minWidth}" data-index="${index}" data-field="minWidth">
-        <input type="number" placeholder="Max (px)" value="${bp.maxWidth === 9999 ? '' : bp.maxWidth}" data-index="${index}" data-field="maxWidth">
-      </div>
-      <button class="btn-remove" data-index="${index}">Remove</button>
-    `;
+
+    const inputs = document.createElement('div');
+    inputs.className = 'breakpoint-inputs';
+
+    // Built with createElement and property assignment rather than an innerHTML
+    // template: breakpoint names are user-supplied and this is a privileged
+    // extension page. Setting .value as a property never parses as markup.
+    inputs.appendChild(makeBreakpointInput('text', 'Name', bp.name, index, 'name'));
+    inputs.appendChild(makeBreakpointInput('number', 'Min (px)', bp.minWidth, index, 'minWidth'));
+    inputs.appendChild(makeBreakpointInput(
+      'number', 'Max (px)', bp.maxWidth === 9999 ? '' : bp.maxWidth, index, 'maxWidth'
+    ));
+
+    const remove = document.createElement('button');
+    remove.className = 'btn-remove';
+    remove.textContent = 'Remove';
+    remove.dataset.index = String(index);
+
+    item.appendChild(inputs);
+    item.appendChild(remove);
     container.appendChild(item);
   });
   
@@ -358,37 +415,47 @@ function openSelectedModal() {
   });
 }
 
+// Replaces the select's contents with a single non-selectable message.
+// Modal IDs and titles come from arbitrary page markup, so every option in this
+// file is built with createElement and textContent - nothing here parses as HTML.
+function setSelectMessage(selectEl, message) {
+  const option = document.createElement('option');
+  option.value = '';
+  option.textContent = message;
+  selectEl.replaceChildren(option);
+}
+
 function refreshModalsList() {
   const selectEl = document.getElementById('modal-select');
   const countEl = document.getElementById('modal-count');
   const versionEl = document.getElementById('modal-bs-version');
   const openBtn = document.getElementById('openModal');
-  
-  selectEl.innerHTML = '<option value="">-- Scanning... --</option>';
+
+  setSelectMessage(selectEl, '-- Scanning... --');
   selectEl.disabled = true;
   openBtn.disabled = true;
-  
+
   sendMessageToTab({ action: 'getModals' }).then(response => {
     countEl.textContent = response.modals.length;
-    
+
     const versionMap = { 0: 'None', 3: 'Bootstrap 3', 4: 'Bootstrap 4', 5: 'Bootstrap 5' };
     versionEl.textContent = versionMap[response.version] || 'Unknown';
-    
-    selectEl.innerHTML = '';
-    
+
     if (response.modals.length === 0) {
-      selectEl.innerHTML = '<option value="">-- No modals found --</option>';
+      setSelectMessage(selectEl, '-- No modals found --');
       selectEl.disabled = true;
       openBtn.disabled = true;
       return;
     }
-    
+
+    selectEl.replaceChildren();
+
     // Add placeholder option
     const placeholder = document.createElement('option');
     placeholder.value = '';
     placeholder.textContent = `-- Select a modal (${response.modals.length} found) --`;
     selectEl.appendChild(placeholder);
-    
+
     // Add modal options
     response.modals.forEach(modal => {
       const option = document.createElement('option');
@@ -396,11 +463,11 @@ function refreshModalsList() {
       option.textContent = modal.title ? `#${modal.id} - ${modal.title}` : `#${modal.id}`;
       selectEl.appendChild(option);
     });
-    
+
     selectEl.disabled = false;
     openBtn.disabled = false;
   }).catch(err => {
-    selectEl.innerHTML = '<option value="">-- Error loading modals --</option>';
+    setSelectMessage(selectEl, '-- Error loading modals --');
     countEl.textContent = '-';
     selectEl.disabled = true;
     openBtn.disabled = true;
