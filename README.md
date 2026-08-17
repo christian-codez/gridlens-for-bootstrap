@@ -146,7 +146,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.9.0
+1.9.1
 
 ## Icons
 

@@ -115,6 +115,13 @@ function saveSync(values, onSaved) {
   });
 }
 
+// Distinguishes "no content script on this page", which is normal, from a real
+// fault in the popup, which must surface rather than be shown as a status word.
+function isNoContentScript(err) {
+  const m = (err && err.message) || '';
+  return /Receiving end does not exist|Could not establish connection|no tab|cannot be scripted/i.test(m);
+}
+
 function showStatus(message, type = 'success') {
   const existing = document.querySelector('.status-message');
   if (existing) existing.remove();
@@ -701,6 +708,18 @@ function setupBreakpointIO() {
   refreshJson();
 }
 
+const VERSION_NAMES = { 0: 'None detected', 3: 'Bootstrap 3', 4: 'Bootstrap 4', 5: 'Bootstrap 5' };
+
+// Detection reaches the page's own globals, so an exact version is often
+// available. "Bootstrap 5.3.3" tells you far more than "Bootstrap 5",
+// particularly when the grid looks wrong.
+function describeVersion(response) {
+  const name = VERSION_NAMES[response.version] || 'Unknown';
+  if (!response.version) return name;
+  const label = response.exactVersion ? 'Bootstrap ' + response.exactVersion : name;
+  return response.isAuto ? label + ' (auto)' : label + ' (manual)';
+}
+
 // ===== TOOLTIPS PANEL =====
 function setupTooltipsPanel() {
   document.getElementById('toggleTooltips').addEventListener('click', toggleTooltips);
@@ -763,7 +782,18 @@ function updateTooltipStatus() {
     btn.disabled = response.count === 0;
     btn.title = response.count === 0 ? 'No tooltips found' : `Toggle ${response.count} tooltip(s)`;
   }).catch(err => {
-    document.getElementById('tooltip-count').textContent = 'Error';
+    // A messaging failure means the extension cannot run on this page, which is
+    // expected and gets a plain readout. Anything else is a bug in here, and
+    // must not be quietly relabelled "Error" - a refactor once deleted two
+    // functions this chain calls and the only symptom was that word.
+    if (!isNoContentScript(err)) {
+      console.error('GridLens: tooltip status failed', err);
+      throw err;
+    }
+    document.getElementById('tooltip-count').textContent = '—';
+    document.getElementById('bootstrap-version').textContent = 'Not available here';
+    document.getElementById('tooltip-status').textContent = '—';
+    document.getElementById('toggleTooltips').disabled = true;
   });
 }
 

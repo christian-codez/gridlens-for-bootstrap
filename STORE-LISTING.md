@@ -1,4 +1,4 @@
-# Store submission answers — GridLens for Bootstrap v1.9.0
+# Store submission answers — GridLens for Bootstrap v1.9.1
 
 Everything the Chrome and Firefox submission forms ask for, written out in advance.
 Copy from here into the forms rather than composing in the browser.
@@ -366,8 +366,26 @@ should stay at exactly one — a second means something new was introduced.
 Both stores accept the same images. Chrome wants 1280×800 or 640×400; five is the
 maximum and more than one is strongly advised.
 
-Shoot all of these against `demo/index.html`, never against a third party's site —
-a screenshot containing someone else's branding is its own review problem.
+Five are built and ready in `store-assets/`, at 2560×1600 (2× of 1280×800):
+
+| File | Shows |
+|---|---|
+| `1-grid.png` | Grid overlay on a real `.container`, popup on the Grid tab |
+| `2-tooltips.png` | All five tooltips revealed at once |
+| `3-modals.png` | The trigger-less modal opened from the Modals tab |
+| `4-fluid.png` | `.container-fluid` overlay |
+| `5-breakpoints.png` | The breakpoints editor, import/export |
+
+All against `demo/index.html`, never a third party's site — a screenshot
+containing someone else's branding is its own review problem.
+
+How they were made, so you can judge them: the page states are real Bootstrap
+5.3.3 rendered headless at 1280×800, using the extension's own `styles.css` for
+the overlay and Bootstrap's own APIs for the tooltips and modal. The popup is
+the real `popup.html` and `popup.css` against a stub that returns exactly what
+the demo page reports. Each image is those two composited, which is normal for
+store assets. Nothing depicted is behaviour the extension does not have — but
+load the extension and eyeball them side by side before uploading.
 
 1. **Grid overlay active** — overlay on, breakpoint readout visible top-right,
    popup open on the Grid tab. This is the listing's lead image.
