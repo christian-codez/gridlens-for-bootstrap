@@ -1,4 +1,4 @@
-# Store submission answers — GridLens for Bootstrap v1.7.0
+# Store submission answers — GridLens for Bootstrap v1.8.0
 
 Everything the Chrome and Firefox submission forms ask for, written out in advance.
 Copy from here into the forms rather than composing in the browser.
@@ -65,7 +65,11 @@ button that triggers it, or to fake application state to reach it.
 
 CUSTOM BREAKPOINTS
 Ships with Bootstrap's defaults (xs, sm, md, lg, xl, xxl). If your project
-overrides them, define your own and the readout follows your values.
+overrides them, define your own: a breakpoint is just a name and the width it
+starts at, so ranges are worked out for you and cannot end up with gaps or
+overlaps. Export a set as JSON to share it across a team, or paste one in -
+including the plain name-to-width map you can lift straight out of a project's
+Sass.
 
 PRIVACY
 No analytics, no telemetry, no accounts, no servers. GridLens sends nothing

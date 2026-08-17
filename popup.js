@@ -1,13 +1,17 @@
 // GridLens for Bootstrap - Popup Script
 
 // ===== Constants =====
+// A breakpoint is a name and the width it starts at, matching Bootstrap's own
+// $grid-breakpoints. The upper bound is derived from the next entry, so it is
+// shown but never typed - which is what removes the whole class of gaps,
+// overlaps and contradictory bounds the previous min+max editor allowed.
 const DEFAULT_BREAKPOINTS = [
-  { name: 'xs', minWidth: 0, maxWidth: 575 },
-  { name: 'sm', minWidth: 576, maxWidth: 767 },
-  { name: 'md', minWidth: 768, maxWidth: 991 },
-  { name: 'lg', minWidth: 992, maxWidth: 1199 },
-  { name: 'xl', minWidth: 1200, maxWidth: 1399 },
-  { name: 'xxl', minWidth: 1400, maxWidth: 9999 }
+  { name: 'xs',  minWidth: 0 },
+  { name: 'sm',  minWidth: 576 },
+  { name: 'md',  minWidth: 768 },
+  { name: 'lg',  minWidth: 992 },
+  { name: 'xl',  minWidth: 1200 },
+  { name: 'xxl', minWidth: 1400 }
 ];
 
 // ===== State =====
@@ -31,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTooltipsPanel();
   setupModalsPanel();
   setupCollapsibles();
+  setupBreakpointIO();
   
   // Update breakpoint every second
   setInterval(updateCurrentBreakpoint, 1000);
@@ -115,10 +120,18 @@ function loadSettings() {
     }
     updateContainerTypeButtons();
 
-    if (result.customBreakpoints && result.customBreakpoints.length > 0) {
-      customBreakpoints = result.customBreakpoints;
-      renderBreakpoints();
-    }
+    // Seed the editor with Bootstrap's defaults when nothing is stored. It used
+    // to open empty, so anyone wanting to tweak one breakpoint had to retype all
+    // six from memory first.
+    customBreakpoints = (result.customBreakpoints && result.customBreakpoints.length)
+      ? result.customBreakpoints.map(bp => ({
+          name: String(bp.name || '').trim(),
+          // Sets saved by earlier versions carried a maxWidth; it is derived now.
+          minWidth: Math.max(0, parseInt(bp.minWidth, 10) || 0)
+        })).sort((a, b) => a.minWidth - b.minWidth)
+      : cloneDefaults();
+    renderBreakpoints();
+    refreshJson();
 
     if (result.gridColor) {
       gridColor = result.gridColor;
@@ -271,111 +284,348 @@ function resetGridColor() {
   });
 }
 
-function makeBreakpointInput(type, placeholder, value, index, field) {
+function cloneDefaults() {
+  return DEFAULT_BREAKPOINTS.map(bp => ({ name: bp.name, minWidth: bp.minWidth }));
+}
+
+// Sorted view used for derived ranges. Rows keep their entry order while you
+// type; sorting happens on commit so the cursor never jumps mid-edit.
+function sortedBreakpoints() {
+  return customBreakpoints
+    .map((bp, i) => ({ ...bp, i }))
+    .sort((a, b) => a.minWidth - b.minWidth);
+}
+
+function rangeLabel(bp) {
+  const order = sortedBreakpoints();
+  const pos = order.findIndex(o => o.i === bp.i);
+  const next = order[pos + 1];
+  const upper = next ? next.minWidth - 1 : null;
+  if (upper !== null && upper < bp.minWidth) return 'never matches';
+  return bp.minWidth + ' – ' + (upper === null ? '∞' : upper);
+}
+
+// Problems block saving. Notes are advisory - a set can be unusual without
+// being wrong, and refusing to save it would just be in the way.
+function inspectBreakpoints() {
+  const problems = [];
+  const notes = [];
+  const names = new Map();
+  const starts = new Map();
+
+  customBreakpoints.forEach((bp, i) => {
+    const name = (bp.name || '').trim();
+    if (!name) problems.push({ i, msg: 'Row ' + (i + 1) + ' has no name.' });
+    else names.set(name.toLowerCase(), (names.get(name.toLowerCase()) || 0) + 1);
+
+    if (!Number.isFinite(bp.minWidth) || bp.minWidth < 0) {
+      problems.push({ i, msg: 'Row ' + (i + 1) + ' needs a start width of 0 or more.' });
+    } else {
+      starts.set(bp.minWidth, (starts.get(bp.minWidth) || 0) + 1);
+    }
+  });
+
+  names.forEach((count, name) => {
+    if (count > 1) problems.push({ msg: 'The name "' + name + '" is used ' + count + ' times.' });
+  });
+  starts.forEach((count, px) => {
+    if (count > 1) problems.push({ msg: 'Two breakpoints both start at ' + px + 'px.' });
+  });
+
+  if (!customBreakpoints.length) problems.push({ msg: 'Add at least one breakpoint.' });
+
+  const order = sortedBreakpoints();
+  if (order.length && order[0].minWidth !== 0) {
+    notes.push('Nothing covers widths below ' + order[0].minWidth + 'px. Start your first breakpoint at 0 to cover them.');
+  }
+
+  return { problems, notes };
+}
+
+function renderIssues() {
+  const box = document.getElementById('bp-issues');
+  const { problems, notes } = inspectBreakpoints();
+  const all = problems.map(p => p.msg).concat(notes);
+
+  box.replaceChildren();
+  if (!all.length) { box.hidden = true; return; }
+
+  all.forEach(msg => {
+    const li = document.createElement('li');
+    li.textContent = msg;
+    box.appendChild(li);
+  });
+  box.classList.toggle('notes-only', problems.length === 0);
+  box.hidden = false;
+
+  const invalid = new Set(problems.map(p => p.i).filter(i => i !== undefined));
+  document.querySelectorAll('.breakpoint-item').forEach((row, i) => {
+    row.classList.toggle('bp-row-invalid', invalid.has(i));
+  });
+}
+
+function makeInput(type, placeholder, value, index, field) {
   const input = document.createElement('input');
   input.type = type;
   input.placeholder = placeholder;
   input.value = value;
   input.dataset.index = String(index);
   input.dataset.field = field;
+  if (type === 'number') { input.min = '0'; input.step = '1'; }
   return input;
 }
 
 function renderBreakpoints() {
   const container = document.getElementById('breakpointsList');
   container.replaceChildren();
-  
+
+  const order = sortedBreakpoints();
+
   customBreakpoints.forEach((bp, index) => {
-    const item = document.createElement('div');
-    item.className = 'breakpoint-item';
+    const row = document.createElement('div');
+    row.className = 'breakpoint-item';
 
-    const inputs = document.createElement('div');
-    inputs.className = 'breakpoint-inputs';
+    // Built with createElement rather than an innerHTML template: names are
+    // user-supplied and this is a privileged extension page.
+    row.appendChild(makeInput('text', 'name', bp.name, index, 'name'));
+    row.appendChild(makeInput('number', 'px', bp.minWidth, index, 'minWidth'));
 
-    // Built with createElement and property assignment rather than an innerHTML
-    // template: breakpoint names are user-supplied and this is a privileged
-    // extension page. Setting .value as a property never parses as markup.
-    inputs.appendChild(makeBreakpointInput('text', 'Name', bp.name, index, 'name'));
-    inputs.appendChild(makeBreakpointInput('number', 'Min (px)', bp.minWidth, index, 'minWidth'));
-    inputs.appendChild(makeBreakpointInput(
-      'number', 'Max (px)', bp.maxWidth === 9999 ? '' : bp.maxWidth, index, 'maxWidth'
-    ));
+    const range = document.createElement('span');
+    range.className = 'bp-range';
+    range.textContent = rangeLabel(order.find(o => o.i === index) || { ...bp, i: index });
+    row.appendChild(range);
 
     const remove = document.createElement('button');
-    remove.className = 'btn-remove';
-    remove.textContent = 'Remove';
+    remove.className = 'bp-remove';
+    remove.textContent = '×';
+    remove.title = 'Remove this breakpoint';
+    remove.setAttribute('aria-label', 'Remove breakpoint ' + (bp.name || index + 1));
     remove.dataset.index = String(index);
+    remove.disabled = customBreakpoints.length <= 1;
+    row.appendChild(remove);
 
-    item.appendChild(inputs);
-    item.appendChild(remove);
-    container.appendChild(item);
+    container.appendChild(row);
   });
-  
+
   container.querySelectorAll('input').forEach(input => {
+    // `input` keeps typing responsive; `change` (blur or Enter) is the commit
+    // point where rows re-sort, so the cursor never jumps out from under you.
     input.addEventListener('input', (e) => {
-      const index = parseInt(e.target.dataset.index);
+      const index = parseInt(e.target.dataset.index, 10);
       const field = e.target.dataset.field;
       if (field === 'name') {
-        customBreakpoints[index][field] = e.target.value;
+        customBreakpoints[index].name = e.target.value;
       } else {
-        const value = parseInt(e.target.value);
-        customBreakpoints[index][field] = isNaN(value) || e.target.value === '' ? 9999 : value;
+        const raw = e.target.value.trim();
+        // An emptied start width means 0, not a sentinel. The old editor turned
+        // it into 9999, silently creating a breakpoint that could never match.
+        const value = raw === '' ? 0 : parseInt(raw, 10);
+        customBreakpoints[index].minWidth = Number.isFinite(value) ? value : NaN;
       }
+      updateRanges();
+      renderIssues();
+      refreshJson();
+    });
+
+    input.addEventListener('change', () => {
+      const before = customBreakpoints.map(b => b.name + ':' + b.minWidth).join('|');
+      customBreakpoints.sort((a, b) => a.minWidth - b.minWidth);
+      if (customBreakpoints.map(b => b.name + ':' + b.minWidth).join('|') !== before) {
+        renderBreakpoints();
+      }
+      renderIssues();
+      refreshJson();
     });
   });
-  
-  container.querySelectorAll('.btn-remove').forEach(button => {
+
+  container.querySelectorAll('.bp-remove').forEach(button => {
     button.addEventListener('click', (e) => {
-      customBreakpoints.splice(parseInt(e.target.dataset.index), 1);
+      customBreakpoints.splice(parseInt(e.currentTarget.dataset.index, 10), 1);
       renderBreakpoints();
+      renderIssues();
+      refreshJson();
     });
+  });
+
+  renderIssues();
+}
+
+function updateRanges() {
+  const order = sortedBreakpoints();
+  document.querySelectorAll('.breakpoint-item').forEach((row, index) => {
+    const cell = row.querySelector('.bp-range');
+    const entry = order.find(o => o.i === index);
+    if (cell && entry) cell.textContent = rangeLabel(entry);
   });
 }
 
 function addBreakpoint() {
-  customBreakpoints.push({ name: '', minWidth: 0, maxWidth: 9999 });
+  const widest = customBreakpoints.reduce((m, b) => Math.max(m, b.minWidth || 0), 0);
+  customBreakpoints.push({ name: '', minWidth: widest ? widest + 200 : 0 });
   renderBreakpoints();
+  refreshJson();
+  const rows = document.querySelectorAll('.breakpoint-item input[data-field="name"]');
+  if (rows.length) rows[rows.length - 1].focus();
 }
 
 function saveBreakpoints() {
-  const valid = customBreakpoints.every(bp => 
-    bp.name && bp.name.trim() !== '' && !isNaN(bp.minWidth) && !isNaN(bp.maxWidth) && bp.minWidth >= 0
-  );
-  
-  if (!valid) {
-    showStatus('Please fill all fields correctly', 'error');
+  const { problems } = inspectBreakpoints();
+  if (problems.length) {
+    renderIssues();
+    showStatus(problems.length === 1 ? problems[0].msg : 'Fix the highlighted rows first', 'error');
     return;
   }
-  
-  customBreakpoints.sort((a, b) => a.minWidth - b.minWidth);
-  
+
+  customBreakpoints = customBreakpoints
+    .map(bp => ({ name: bp.name.trim(), minWidth: bp.minWidth }))
+    .sort((a, b) => a.minWidth - b.minWidth);
+
   chrome.storage.sync.set({ customBreakpoints }, () => {
-    sendMessageToTab({ action: 'updateBreakpoints', breakpoints: customBreakpoints });
-    showStatus('Breakpoints saved!');
+    renderBreakpoints();
+    refreshJson();
+    sendMessageToTab({ action: 'updateBreakpoints', breakpoints: customBreakpoints }).catch(() => {});
+    showStatus('Breakpoints saved');
   });
 }
 
 function resetBreakpoints() {
-  customBreakpoints = [];
+  customBreakpoints = cloneDefaults();
+  // Storing an empty set means "no override", so the content script falls back
+  // to its own defaults rather than to a copy that could drift from them.
   chrome.storage.sync.set({ customBreakpoints: [] }, () => {
     renderBreakpoints();
-    sendMessageToTab({ action: 'updateBreakpoints', breakpoints: [] });
-    showStatus('Reset to Bootstrap defaults');
+    refreshJson();
+    sendMessageToTab({ action: 'updateBreakpoints', breakpoints: [] }).catch(() => {});
+    showStatus('Back to Bootstrap defaults');
   });
 }
 
-const VERSION_NAMES = { 0: 'None detected', 3: 'Bootstrap 3', 4: 'Bootstrap 4', 5: 'Bootstrap 5' };
+// ===== IMPORT / EXPORT =====
 
-// Detection now reaches the page's own globals, so an exact version string is
-// often available. Show it when we have it - "Bootstrap 5.3.3" tells you far
-// more than "Bootstrap 5", particularly when the grid looks wrong.
-function describeVersion(response) {
-  const name = VERSION_NAMES[response.version] || 'Unknown';
-  if (!response.version) return name;
+const BP_FILE_TAG = 'gridlens-breakpoints';
 
-  const exact = response.exactVersion;
-  const label = exact ? `Bootstrap ${exact}` : name;
-  return response.isAuto ? `${label} (auto)` : `${label} (manual)`;
+function breakpointsToJson() {
+  return JSON.stringify({
+    format: BP_FILE_TAG,
+    version: 1,
+    breakpoints: customBreakpoints.map(bp => ({ name: bp.name, minWidth: bp.minWidth }))
+  }, null, 2);
+}
+
+function refreshJson() {
+  const box = document.getElementById('bp-json');
+  if (box && document.activeElement !== box) box.value = breakpointsToJson();
+}
+
+function ioStatus(message, kind) {
+  const el = document.getElementById('bp-io-status');
+  if (!el) return;
+  el.textContent = message;
+  el.className = 'bp-io-status' + (kind ? ' is-' + kind : '');
+  el.hidden = !message;
+}
+
+// Deliberately generous about shape. A set might arrive as our own export, a
+// bare array, or the name-to-width object that mirrors Bootstrap's Sass map -
+// all three are unambiguous, so all three are accepted.
+function parseBreakpointsPayload(text) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    throw new Error("That isn't valid JSON.");
+  }
+
+  let list;
+  if (Array.isArray(data)) {
+    list = data;
+  } else if (data && Array.isArray(data.breakpoints)) {
+    list = data.breakpoints;
+  } else if (data && typeof data === 'object') {
+    list = Object.keys(data)
+      .filter(k => typeof data[k] === 'number')
+      .map(k => ({ name: k, minWidth: data[k] }));
+    if (!list.length) throw new Error('No breakpoints found in there.');
+  } else {
+    throw new Error('No breakpoints found in there.');
+  }
+
+  const parsed = list
+    .map(bp => {
+      if (!bp || typeof bp !== 'object') return null;
+      const name = String(bp.name === undefined ? '' : bp.name).trim();
+      // minWidth is the field; min and width are accepted as friendly aliases.
+      const raw = bp.minWidth !== undefined ? bp.minWidth
+                : bp.min !== undefined ? bp.min
+                : bp.width;
+      const minWidth = parseInt(raw, 10);
+      if (!name || !Number.isFinite(minWidth) || minWidth < 0) return null;
+      return { name, minWidth };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.minWidth - b.minWidth);
+
+  if (!parsed.length) throw new Error('No usable breakpoints in there — each needs a name and a start width.');
+  return parsed;
+}
+
+function applyJson() {
+  const box = document.getElementById('bp-json');
+  try {
+    const parsed = parseBreakpointsPayload(box.value);
+    customBreakpoints = parsed;
+    renderBreakpoints();
+    box.value = breakpointsToJson();
+    ioStatus('Loaded ' + parsed.length + ' breakpoints. Hit Save to apply them.', 'ok');
+  } catch (err) {
+    ioStatus(err.message, 'error');
+  }
+}
+
+function copyJson() {
+  const text = document.getElementById('bp-json').value;
+  navigator.clipboard.writeText(text)
+    .then(() => ioStatus('Copied to the clipboard.', 'ok'))
+    .catch(() => ioStatus('Could not copy — select the text and copy manually.', 'error'));
+}
+
+function downloadJson() {
+  const blob = new Blob([breakpointsToJson()], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'gridlens-breakpoints.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  ioStatus('Saved gridlens-breakpoints.json.', 'ok');
+}
+
+function loadFromFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    document.getElementById('bp-json').value = String(reader.result || '');
+    applyJson();
+  };
+  reader.onerror = () => ioStatus('Could not read that file.', 'error');
+  reader.readAsText(file);
+}
+
+function setupBreakpointIO() {
+  document.getElementById('bpApply').addEventListener('click', applyJson);
+  document.getElementById('bpCopy').addEventListener('click', copyJson);
+  document.getElementById('bpDownload').addEventListener('click', downloadJson);
+
+  const file = document.getElementById('bpFile');
+  document.getElementById('bpPickFile').addEventListener('click', () => file.click());
+  file.addEventListener('change', (e) => {
+    loadFromFile(e.target.files && e.target.files[0]);
+    e.target.value = '';
+  });
+
+  refreshJson();
 }
 
 // ===== TOOLTIPS PANEL =====

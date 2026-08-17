@@ -81,6 +81,14 @@
 <h3>Show Grid is greyed out</h3>
 <p>No Bootstrap was detected on that page, so there's no grid to overlay. If you know Bootstrap is there — a heavily customised build, say — set the version manually in the Tooltips tab instead of leaving it on auto-detect, and the overlay will draw regardless.</p>
 
+<h3>How do custom breakpoints work?</h3>
+<p>A breakpoint is a name and the width it starts at — the same shape as Bootstrap's <code>$grid-breakpoints</code>. Each one runs until the next begins and the last runs to infinity, so the ranges shown beside each row are worked out for you rather than typed. That is deliberate: entering both ends lets them disagree, which is how you get gaps and overlapping breakpoints.</p>
+<p>The editor opens pre-filled with Bootstrap's defaults, so you can change one value rather than retyping all six. Rows re-sort themselves when you finish editing a width, and anything that would stop a set working — a missing name, two breakpoints starting at the same width — is flagged before you can save.</p>
+
+<h3>Can I share a set of breakpoints?</h3>
+<p>Yes. Open <em>Import &amp; export</em> under Custom Breakpoints. The box holds the current set as JSON: copy it, or download it as a file to commit alongside a project. To load one, paste it in and press Apply, or use <em>Load from file</em>.</p>
+<p>Import is deliberately forgiving about shape. It accepts a file exported from GridLens, a bare array of <code>{"name": "...", "minWidth": ...}</code> entries, or the plain <code>{"sm": 576, "md": 768}</code> map you can lift straight out of a project's Sass.</p>
+
 <h3>Switching container type doesn't seem to change anything</h3>
 <p>Three things to check. Below 576px wide, <code>.container</code> is full-width anyway, so it and <code>.container-fluid</code> are genuinely identical — widen the window and the difference appears. The overlay also has to be switched on to see any change to it. And if you loaded the extension from source, reload it at <code>chrome://extensions</code> after updating; the version shown at the bottom of the popup tells you which build is actually running.</p>
 

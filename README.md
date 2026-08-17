@@ -26,7 +26,8 @@ otherwise mean digging through DevTools:
 - The active breakpoint also shows on the toolbar icon badge, on any page that
   uses Bootstrap — and stays out of the way on pages that don't
 - Custom overlay colour
-- Define your own breakpoints if your project overrides Bootstrap's
+- Define your own breakpoints if your project overrides Bootstrap's, and
+  import or export a set as JSON to share it across a team
 
 ### Version Detection
 Detection runs in the page's own JavaScript context, so it sees what the page
@@ -90,6 +91,13 @@ Requires Chrome 111+ or Firefox 128+.
 
 Click the GridLens icon in the toolbar, then pick a tab.
 
+**Custom breakpoints** — a breakpoint is a name and the width it starts at,
+the same shape as Bootstrap's `$grid-breakpoints`. Each one runs until the next
+begins, so upper bounds are derived and shown rather than typed — which is what
+makes gaps and overlaps impossible rather than merely discouraged. Import and
+export accept our own format, a bare array, or the plain `{"sm": 576}` map you
+can lift straight out of a project's Sass.
+
 **Grid** — *Show Grid* toggles the overlay. *Container Type* switches between
 `.container` (fixed max-width per breakpoint) and `.container-fluid` (full
 width). The colour picker changes the overlay colour. Expand *Custom
@@ -138,7 +146,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.7.0
+1.8.0
 
 ## Icons
 

@@ -8,14 +8,39 @@
   // GRID OVERLAY MODULE
   // =============================================
   
+  // A breakpoint set is a name -> minimum-width map, the same shape as
+  // Bootstrap's own $grid-breakpoints. Each entry runs until the next one
+  // starts and the last runs to infinity, so upper bounds are derived rather
+  // than stored.
+  //
+  // Storing both ends let them contradict each other: gaps, overlaps, and a
+  // 9999 sentinel that meant "infinity" in the popup while this file used
+  // Infinity, so a saved set behaved differently from the built-in defaults
+  // above 9999px.
   const DEFAULT_BREAKPOINTS = [
-    { name: 'xs', minWidth: 0, maxWidth: 575 },
-    { name: 'sm', minWidth: 576, maxWidth: 767 },
-    { name: 'md', minWidth: 768, maxWidth: 991 },
-    { name: 'lg', minWidth: 992, maxWidth: 1199 },
-    { name: 'xl', minWidth: 1200, maxWidth: 1399 },
-    { name: 'xxl', minWidth: 1400, maxWidth: Infinity }
+    { name: 'xs',  minWidth: 0 },
+    { name: 'sm',  minWidth: 576 },
+    { name: 'md',  minWidth: 768 },
+    { name: 'lg',  minWidth: 992 },
+    { name: 'xl',  minWidth: 1200 },
+    { name: 'xxl', minWidth: 1400 }
   ];
+
+  // Also migrates sets saved by earlier versions, which carried a maxWidth.
+  function normalizeBreakpoints(list) {
+    return (list || [])
+      .filter(bp => bp && typeof bp.name === 'string' && bp.name.trim() !== '')
+      .map(bp => ({
+        name: bp.name.trim(),
+        minWidth: Math.max(0, parseInt(bp.minWidth, 10) || 0)
+      }))
+      .sort((a, b) => a.minWidth - b.minWidth);
+  }
+
+  function activeBreakpoints() {
+    const custom = normalizeBreakpoints(customBreakpoints);
+    return custom.length ? custom : DEFAULT_BREAKPOINTS;
+  }
 
   // Bootstrap's real container geometry, per major version.
   //
@@ -290,19 +315,25 @@
 
   function getCurrentBreakpoint() {
     const width = window.innerWidth;
-    const breakpoints = customBreakpoints.length > 0 ? customBreakpoints : DEFAULT_BREAKPOINTS;
-    
-    for (const bp of breakpoints) {
-      if (width >= bp.minWidth && width <= bp.maxWidth) {
+    const list = activeBreakpoints();
+
+    // Walk from the widest down: the first entry whose start the viewport has
+    // reached is the active one, and its upper bound is wherever the next
+    // entry begins.
+    for (let i = list.length - 1; i >= 0; i--) {
+      if (width >= list[i].minWidth) {
+        const next = list[i + 1];
+        const upper = next ? next.minWidth - 1 : null;
         return {
-          name: bp.name,
+          name: list[i].name,
           width: width,
-          range: `${bp.minWidth}px - ${bp.maxWidth === Infinity ? '∞' : bp.maxWidth + 'px'}`
+          range: list[i].minWidth + 'px - ' + (upper === null ? '∞' : upper + 'px')
         };
       }
     }
-    
-    return { name: 'unknown', width: width, range: 'N/A' };
+
+    // Only reachable when the narrowest breakpoint starts above 0.
+    return { name: 'unknown', width: width, range: 'below ' + list[0].minWidth + 'px' };
   }
 
   function makeIndicatorRow(className, text) {

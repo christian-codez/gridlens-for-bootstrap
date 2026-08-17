@@ -85,13 +85,47 @@
             <span class="collapse-icon icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 9.5 12 15l5.5-5.5"/></svg></span>
           </button>
           <div id="breakpoints-section" class="collapsible-content">
-            <p class="help-text">Add custom breakpoints or use Bootstrap defaults.</p>
+            <p class="help-text">
+              A breakpoint is a name and the width it starts at &mdash; the same shape as
+              Bootstrap&rsquo;s <code>$grid-breakpoints</code>. Each one runs until the next
+              begins, so the ranges are worked out for you.
+            </p>
+
+            <div class="bp-head" aria-hidden="true">
+              <span>Name</span>
+              <span>Starts at</span>
+              <span>Range</span>
+              <span></span>
+            </div>
+
             <div id="breakpointsList" class="breakpoints-list"></div>
-            <button id="addBreakpoint" class="btn-add">+ Add Breakpoint</button>
+
+            <ul id="bp-issues" class="bp-issues" hidden></ul>
+
+            <button id="addBreakpoint" class="btn-add">+ Add breakpoint</button>
+
             <div class="button-group">
               <button id="saveBreakpoints" class="btn-primary-small">Save</button>
-              <button id="resetBreakpoints" class="btn-secondary-small">Reset</button>
+              <button id="resetBreakpoints" class="btn-secondary-small">Bootstrap defaults</button>
             </div>
+
+            <details class="bp-io">
+              <summary>Import &amp; export</summary>
+              <p class="help-text">
+                Edit or paste a set below and hit Apply. Handy for sharing one across a team,
+                or lifting it straight out of a project&rsquo;s Sass.
+              </p>
+              <textarea id="bp-json" class="bp-json" rows="8" spellcheck="false"
+                        aria-label="Breakpoints as JSON"></textarea>
+              <p id="bp-io-status" class="bp-io-status" hidden></p>
+              <div class="bp-io-actions">
+                <button id="bpApply" class="btn-primary-small">Apply</button>
+                <button id="bpCopy" class="btn-secondary-small">Copy</button>
+                <button id="bpDownload" class="btn-secondary-small">Download</button>
+              </div>
+              <button id="bpPickFile" class="bp-file-btn">Load from file&hellip;</button>
+              <input type="file" id="bpFile" accept="application/json,.json" hidden>
+            </details>
           </div>
         </div>
       </div>

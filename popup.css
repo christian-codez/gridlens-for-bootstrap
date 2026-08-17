@@ -342,37 +342,205 @@ header h1 {
   margin-bottom: 12px;
 }
 
-/* Breakpoints List */
+/* Breakpoints editor
+   ------------------------------------------------------------------
+   Rows are name + start width only. The upper bound is derived from the next
+   row and shown read-only, which is why there is no third input: storing both
+   ends is redundant data that can disagree with itself. */
 .breakpoints-list {
-  margin-bottom: 12px;
-}
-
-.breakpoint-item {
-  background: var(--gl-surface-2);
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-  border: 1px solid var(--gl-rule);
-}
-
-.breakpoint-inputs {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
   gap: 6px;
-  margin-bottom: 6px;
 }
 
-.breakpoint-inputs input {
-  padding: 6px;
+.bp-head,
+.breakpoint-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 68px minmax(72px, auto) 26px;
+  gap: 8px;
+  align-items: center;
+}
+
+.bp-head {
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--gl-faint);
+  padding: 0 2px 6px;
+  border-bottom: 1px solid var(--gl-rule-soft);
+  margin-bottom: 8px;
+}
+
+.bp-range {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--gl-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bp-row-invalid input {
+  border-color: var(--gl-danger);
+}
+
+.bp-remove {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
   border: 1px solid var(--gl-rule);
-  border-radius: 4px;
-  font-size: 12px;
-  width: 100%;
+  border-radius: 5px;
+  color: var(--gl-faint);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: color .15s, border-color .15s;
 }
 
-.breakpoint-inputs input:focus {
+.bp-remove:hover {
+  color: var(--gl-danger);
+  border-color: var(--gl-danger);
+}
+
+.bp-remove:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+/* Validation. Problems block saving; notes are advisory. */
+.bp-issues[hidden] { display: none; }
+
+.bp-issues {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--gl-surface-2);
+  border-left: 3px solid var(--gl-danger);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--gl-ink-2);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bp-issues.notes-only {
+  border-left-color: var(--gl-accent);
+}
+
+/* Import / export */
+.bp-io {
+  margin-top: 14px;
+  border-top: 1px solid var(--gl-rule-soft);
+  padding-top: 12px;
+}
+
+.bp-io > summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--gl-ink-2);
+  list-style: none;
+  padding: 2px 0;
+}
+
+.bp-io > summary::-webkit-details-marker { display: none; }
+
+.bp-io > summary::before {
+  content: "+";
+  display: inline-block;
+  width: 1em;
+  color: var(--gl-accent);
+  font-weight: 700;
+}
+
+.bp-io[open] > summary::before { content: "\2212"; }
+
+.bp-json {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 9px 10px;
+  border: 1px solid var(--gl-rule);
+  border-radius: 6px;
+  background: var(--gl-surface-2);
+  color: var(--gl-ink-2);
+  resize: vertical;
+}
+
+.bp-json:focus {
   outline: none;
   border-color: var(--gl-accent);
+}
+
+.bp-io-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.bp-io-status {
+  font-size: 11.5px;
+  margin: 8px 0 0;
+  color: var(--gl-muted);
+}
+
+.bp-io-status.is-error { color: var(--gl-danger); }
+.bp-io-status.is-ok { color: var(--gl-accent); }
+
+.bp-file-btn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--gl-muted);
+  border: 1px dashed var(--gl-rule);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.bp-file-btn:hover {
+  color: var(--gl-accent);
+  border-color: var(--gl-accent);
+}
+
+/* Inputs need min-width:0 or their intrinsic width refuses to shrink and blows
+   the 1fr track out, squeezing the derived range column into an ellipsis. */
+.breakpoint-item input {
+  min-width: 0;
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--gl-rule);
+  border-radius: 5px;
+  background: var(--gl-surface-2);
+  color: var(--gl-ink);
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.breakpoint-item input[type="number"] {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.breakpoint-item input:focus {
+  outline: none;
+  border-color: var(--gl-accent);
+}
+
+.breakpoint-item input::placeholder {
+  color: var(--gl-faint);
 }
 
 /* Buttons */
