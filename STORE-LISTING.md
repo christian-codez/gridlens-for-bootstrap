@@ -1,12 +1,25 @@
-# Store submission answers — GridLens for Bootstrap v1.8.0
+# Store submission answers — GridLens for Bootstrap v1.8.1
 
 Everything the Chrome and Firefox submission forms ask for, written out in advance.
 Copy from here into the forms rather than composing in the browser.
 
-> **Before submitting, replace `christian-codez` everywhere.** It appears in
-> `manifest.json`, `PRIVACY.md`, `docs/privacy.html`, and `README.md`.
-> The `gecko.id` must be final before your first Firefox upload — changing it after
-> publication creates a different add-on and orphans your existing users.
+> **Publisher identity — CHADA Creatives (chada.ca).**
+>
+> | | |
+> |---|---|
+> | Homepage | https://chada.ca/gridlens/ |
+> | Privacy policy | https://chada.ca/gridlens/privacy/ |
+> | Support | https://chada.ca/gridlens/support/ |
+> | Source | https://github.com/christian-codez/gridlens-for-bootstrap |
+> | Firefox add-on ID | `gridlens@chada.ca` |
+>
+> The `gecko.id` is final once the add-on is first published to AMO. Changing it
+> afterwards creates a *different* add-on and orphans existing users — leave it alone.
+>
+> The chada.ca pages live in `app/public/gridlens/` in the WordPress site.
+> `./sync-site.sh` copies them there from `docs/`; they go live on your next push.
+> Confirm all three URLs resolve over HTTPS **before** submitting — a listing
+> pointing at a privacy policy that 404s is a straightforward rejection.
 
 ---
 
@@ -74,11 +87,33 @@ Sass.
 PRIVACY
 No analytics, no telemetry, no accounts, no servers. GridLens sends nothing
 anywhere. Your four settings are saved in your browser's own extension storage
-and nowhere else. Full policy: https://christian-codez.github.io/gridlens-for-bootstrap/privacy/
+and nowhere else. Full policy: https://chada.ca/gridlens/privacy/
 
 GridLens is an independent project. It is not affiliated with, endorsed by, or
 sponsored by the Bootstrap project or its maintainers.
 ```
+
+## Publisher and trader status
+
+Publishing under an agency name rather than as an individual makes you a
+**trader** under the EU Digital Services Act, and the store requires the
+declaration. Chrome asks for:
+
+- Legal name
+- Address
+- Contact phone number, SMS-capable
+
+**That information is displayed publicly at the bottom of the listing.** Use a
+registered business address rather than a home one if those differ, and have the
+details ready before starting — the form will not let you past it.
+
+Worth doing at the same time: verify the chada.ca domain against the developer
+account, so the listing shows the extension genuinely comes from you. The
+publishing Google account must also have 2-Step Verification enabled or it cannot
+publish at all.
+
+Set the publisher display name to the agency, not a personal account name — it
+appears under the extension on every listing.
 
 ## URLs
 
@@ -86,10 +121,10 @@ Both forms ask for these.
 
 | Field | Value |
 |---|---|
-| Homepage | `https://christian-codez.github.io/gridlens-for-bootstrap/` |
-| Privacy policy | `https://christian-codez.github.io/gridlens-for-bootstrap/privacy/` |
-| Support site | `https://christian-codez.github.io/gridlens-for-bootstrap/support/` |
-| Support email | `nwachukwu16@gmail.com` |
+| Homepage | `https://chada.ca/gridlens/` |
+| Privacy policy | `https://chada.ca/gridlens/privacy/` |
+| Support site | `https://chada.ca/gridlens/support/` |
+| Support email | *(use a chada.ca address so it matches the publisher)* |
 | Source repository | `https://github.com/christian-codez/gridlens-for-bootstrap` |
 
 ## Category
@@ -169,7 +204,7 @@ certification boxes:
 ### Privacy policy URL
 
 ```
-https://christian-codez.github.io/gridlens-for-bootstrap/privacy/
+https://chada.ca/gridlens/privacy/
 ```
 
 ---

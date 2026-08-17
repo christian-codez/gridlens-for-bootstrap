@@ -56,9 +56,11 @@ when the answer changes.
 
 ## Links
 
-- **Homepage** — https://christian-codez.github.io/gridlens-for-bootstrap/
-- **Privacy policy** — https://christian-codez.github.io/gridlens-for-bootstrap/privacy/
-- **Support** — https://christian-codez.github.io/gridlens-for-bootstrap/support/
+Published by [CHADA Creatives](https://chada.ca).
+
+- **Homepage** — https://chada.ca/gridlens/
+- **Privacy policy** — https://chada.ca/gridlens/privacy/
+- **Support** — https://chada.ca/gridlens/support/
 
 ## Install
 
@@ -146,7 +148,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.8.0
+1.8.1
 
 ## Icons
 
@@ -191,6 +193,21 @@ clearly separate from both the tile and the columns.
 The popup palette is defined once as CSS custom properties at the top of
 `popup.css`. Add colours there rather than inline, or the identity drifts —
 which is how the extension ended up half indigo and half teal after the rename.
+
+## Website
+
+`docs/` is the source for the published pages and is also what GitHub Pages
+serves. chada.ca is the canonical home — every page carries a `rel="canonical"`
+pointing there, so the GitHub copy stays a mirror rather than competing with it.
+
+```sh
+./sync-site.sh                 # copies docs/ into the WordPress webroot
+./sync-site.sh /other/webroot  # or somewhere else
+```
+
+The pages link each other relatively, so they work unchanged at any base path.
+WordPress only rewrites requests that don't match a real file or directory, so
+`/gridlens/` is served straight by Apache — no page, plugin or theme change.
 
 ## Packaging
 

@@ -81,8 +81,8 @@ would be a clarification rather than a new use of data.
 
 ## Contact
 
-Questions about this policy: open an issue at
-<https://github.com/christian-codez/gridlens-for-bootstrap/issues>
+Questions about this policy: see <https://chada.ca/gridlens/support/>, or open an
+issue at <https://github.com/christian-codez/gridlens-for-bootstrap/issues>
 
 ---
 
