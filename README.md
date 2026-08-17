@@ -56,11 +56,9 @@ when the answer changes.
 
 ## Links
 
-Published by [CHADA Creatives](https://chada.ca).
-
-- **Homepage** — https://chada.ca/gridlens/
-- **Privacy policy** — https://chada.ca/gridlens/privacy/
-- **Support** — https://chada.ca/gridlens/support/
+- **Homepage** — https://christian-codez.github.io/gridlens-for-bootstrap/
+- **Privacy policy** — https://christian-codez.github.io/gridlens-for-bootstrap/privacy/
+- **Support** — https://christian-codez.github.io/gridlens-for-bootstrap/support/
 
 ## Install
 
@@ -148,7 +146,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.8.1
+1.8.2
 
 ## Icons
 
@@ -166,48 +164,29 @@ icon in the popup, so the mark and the UI read as one family.
 
 ## Theme
 
-Colours come from the CHADA Creatives palette, taken from that theme's source of
-truth at `src/scss/abstracts/_variables.scss`. (Its `theme.json` still lists an
-older orange primary and is stale.)
-
-| Token | Value | Role |
+| | | |
 |---|---|---|
-| `$chada-lime` | `#cdfb47` | Primary — CTAs, active states, focus |
-| `$chada-emerald` | `#2f9e6a` | Toolbar badge only, see below |
-| `$chada-bg` | `#0a0b0a` | Ground |
-| `$chada-surface` | `#141613` | Panels and cards |
-| `$chada-border` | `#26281f` | Hairlines |
-| `$chada-ink` | `#edefe6` | Headings |
-| `$chada-body` | `#b9bcb2` | Body copy |
+| Lime | `#cdfb47` | Primary — CTAs, active states, focus |
+| Emerald | `#2f9e6a` | Toolbar badge only, see below |
+| Ground | `#0a0b0a` | Page background |
+| Surface | `#141613` | Panels and cards |
+| Border | `#26281f` | Hairlines |
+| Ink | `#edefe6` | Headings |
+| Body | `#b9bcb2` | Body copy |
 
 The palette is dark-first by construction: lime scores about 1.3:1 against white
 and about 16:1 against `#0a0b0a`, so it only works on a dark ground. The popup is
-dark because the brand colour requires it, not as a style preference.
+dark because the accent requires it, not as a style preference.
 
 **The badge is emerald, not lime, on purpose.** Chrome paints it over the icon,
 and the icon is a dark tile carrying lime columns — a lime badge sits at 1.0:1
 against those columns, which is what made the breakpoint hard to read. Emerald is
-the only palette colour that stays legible (5.8:1 for its text) while reading as
+the only colour here that stays legible (5.8:1 for its text) while reading as
 clearly separate from both the tile and the columns.
 
 The popup palette is defined once as CSS custom properties at the top of
 `popup.css`. Add colours there rather than inline, or the identity drifts —
 which is how the extension ended up half indigo and half teal after the rename.
-
-## Website
-
-`docs/` is the source for the published pages and is also what GitHub Pages
-serves. chada.ca is the canonical home — every page carries a `rel="canonical"`
-pointing there, so the GitHub copy stays a mirror rather than competing with it.
-
-```sh
-./sync-site.sh                 # copies docs/ into the WordPress webroot
-./sync-site.sh /other/webroot  # or somewhere else
-```
-
-The pages link each other relatively, so they work unchanged at any base path.
-WordPress only rewrites requests that don't match a real file or directory, so
-`/gridlens/` is served straight by Apache — no page, plugin or theme change.
 
 ## Packaging
 

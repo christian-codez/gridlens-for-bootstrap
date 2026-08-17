@@ -1,42 +1,37 @@
 /* GridLens for Bootstrap - Popup Styles */
 
-/* Palette — CHADA Creatives
+/* Palette
    ------------------------------------------------------------------
-   Lifted from the agency theme's source of truth,
-   themes/chada/src/scss/abstracts/_variables.scss. (Note theme.json in that
-   repo still lists an older orange primary and is stale; the SCSS is current.)
+   Dark-first by construction. The lime primary scores about 1.3:1 against white
+   and about 16:1 against #0a0b0a, so it only works on a dark ground - the popup
+   is dark because the accent requires it, not as a style preference.
 
-   This palette is dark-first by construction. The lime primary scores about
-   1.3:1 against white and about 16:1 against #0a0b0a, so it only works on a
-   dark ground - the popup is dark because the brand colour requires it, not as
-   a style preference. It also closes the "no dark mode" gap from the audit.
-
-   Emerald exists here for one job: the toolbar badge. It is the only palette
-   colour that stays legible while reading as clearly different from both the
-   icon's dark tile and its lime columns. */
+   Emerald exists for one job: the toolbar badge. It is the only colour here
+   that stays legible while reading as clearly different from both the icon's
+   dark tile and its lime columns. */
 :root {
-  --gl-bg: #0a0b0a;              /* $chada-bg      */
-  --gl-surface: #141613;         /* $chada-surface */
-  --gl-surface-2: #101210;       /* $chada-surface-alt */
+  --gl-bg: #0a0b0a;              /* ground        */
+  --gl-surface: #141613;         /* panels        */
+  --gl-surface-2: #101210;       /* recessed      */
   --gl-surface-3: #1a1d17;
-  --gl-panel: #0d0f0a;           /* $chada-panel   */
+  --gl-panel: #0d0f0a;
 
-  --gl-accent: #cdfb47;          /* $chada-lime — CTAs, active states, focus */
-  --gl-accent-bright: #dcff6b;   /* $chada-lime-bright — solid-CTA hover */
+  --gl-accent: #cdfb47;          /* CTAs, active states, focus */
+  --gl-accent-bright: #dcff6b;   /* solid-CTA hover */
   --gl-accent-strong: #b6e236;
   --gl-accent-soft: #1d2410;
   --gl-accent-tint: #14180d;
   --gl-on-accent: #0a0b0a;       /* text on a lime fill */
-  --gl-emerald: #2f9e6a;         /* $chada-emerald */
+  --gl-emerald: #2f9e6a;         /* badge only */
 
-  --gl-ink: #edefe6;             /* $chada-ink  — headings */
-  --gl-ink-2: #b9bcb2;           /* $chada-body — body copy */
-  --gl-muted: #8a8d83;           /* $chada-soft */
-  --gl-faint: #70746a;           /* $chada-muted */
+  --gl-ink: #edefe6;             /* headings   */
+  --gl-ink-2: #b9bcb2;           /* body copy  */
+  --gl-muted: #8a8d83;
+  --gl-faint: #70746a;
 
-  --gl-rule: #26281f;            /* $chada-border */
+  --gl-rule: #26281f;            /* hairlines  */
   --gl-rule-soft: #1b1d17;
-  --gl-border-soft: #2a2c28;     /* $chada-border-soft */
+  --gl-border-soft: #2a2c28;
 
   --gl-ok: #2f9e6a;
   --gl-danger: #e4606d;
@@ -45,10 +40,9 @@
   --gl-note-border: #cdfb47;
   --gl-note-ink: #c8cbb8;
 
-  /* Headings follow the theme's type treatment: heavy, tight tracking. The
-     brand faces (Cabinet Grotesk, Inter) are not system fonts and cannot be
-     fetched from an extension, so the stack falls through to the closest
-     grotesques already on the machine. */
+  /* Heavy, tightly tracked headings. Neither display face is a system font
+     and an extension cannot fetch one, so the stack falls through to the
+     closest grotesques already on the machine. */
   --gl-font-heading: 'Cabinet Grotesk', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --gl-font-body: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }

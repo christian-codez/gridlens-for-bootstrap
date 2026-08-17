@@ -10,8 +10,8 @@
     distinctive in a toolbar, and echo the Grid tab icon inside the popup, so
     the mark and the UI read as one family.
 
-    Colours are the CHADA palette: a near-black tile ($chada-bg #0a0b0a, lifted
-    slightly at the top-left) carrying lime columns ($chada-lime #cdfb47).
+    A near-black tile (#0a0b0a, lifted slightly at the top-left) carrying lime
+    columns (#cdfb47).
 
     The toolbar badge is deliberately NOT lime - it is painted over this icon,
     and a lime badge would sit at 1.0:1 against these columns. See background.js.
