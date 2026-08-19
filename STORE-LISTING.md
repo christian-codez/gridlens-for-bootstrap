@@ -347,24 +347,34 @@ should stay at exactly one — a second means something new was introduced.
 Both stores accept the same images. Chrome wants 1280×800 or 640×400; five is the
 maximum and more than one is strongly advised.
 
-Built and ready in `store-assets/`, at the dimensions Chrome documents:
+Built and ready in `store-assets/`, all 24-bit RGB with **no alpha channel** —
+the store rejects images that carry one.
 
-| File | Size | Shows |
+| File | Size | Required? |
 |---|---|---|
-| `1-grid.png` | 1280×800 | Grid overlay on a real `.container`, popup on the Grid tab |
-| `2-tooltips.png` | 1280×800 | All five tooltips revealed at once |
-| `3-components.png` | 1280×800 | The trigger-less modal opened from the Components tab |
-| `4-fluid.png` | 1280×800 | `.container-fluid` overlay |
-| `5-breakpoints.png` | 1280×800 | The breakpoints editor, import/export |
-| `promo-440x280.png` | 440×280 | Small promotional tile |
+| `store-icon-128.png` | 128×128 | **yes** — the listing's own icon |
+| `promo-440x280.png` | 440×280 | **yes** — small promotional tile |
+| `1-grid.png` | 1280×800 | at least one screenshot |
+| `2-tooltips.png` | 1280×800 | |
+| `3-components.png` | 1280×800 | |
+| `4-fluid.png` | 1280×800 | |
+| `5-breakpoints.png` | 1280×800 | |
+| `marquee-1400x560.png` | 1400×560 | no — needed only for marquee placement |
 
-**Screenshots must be exactly 1280×800 or 640×400.** A 2× render is not accepted,
-so `store-assets/2x/` keeps the high-resolution masters and the files at the top
-level are the ones to upload. **The 440×280 promo tile is required**, not
-optional — the store will not let the listing through without it.
+Three things the store is strict about, each of which will stop an upload:
 
-All against `demo/index.html`, never a third party's site — a screenshot
-containing someone else's branding is its own review problem.
+- **Screenshots are 1280×800 or 640×400 and nothing else.** A 2× render is
+  refused, so `store-assets/2x/` keeps the 2560×1600 masters and the files at the
+  top level are the ones to upload.
+- **No alpha channel.** The extension's own `icons/icon128.png` keeps its
+  transparency because the toolbar needs it; `store-icon-128.png` is a separate,
+  flattened copy for the listing. Do not swap one for the other.
+- **The store icon is deliberately not pre-rounded.** An upload with no alpha is
+  placed in a frame with a 12px corner radius, so rounding it here would show the
+  tile's own corners cut off inside that frame.
+
+All screenshots are against `demo/index.html`, never a third party's site — a
+screenshot containing someone else's branding is its own review problem.
 
 How they were made, so you can judge them: the page states are real Bootstrap
 5.3.3 rendered headless at 1280×800, using the extension's own `styles.css` for
