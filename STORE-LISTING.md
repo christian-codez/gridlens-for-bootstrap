@@ -6,30 +6,7 @@ Copy from here into the forms rather than composing in the browser.
 > **Publisher identity — individual, non-trader.**
 >
 > | | |
-> |---|---|
-> | Homepage | https://christian-codez.github.io/gridlens-for-bootstrap/ |
-> | Privacy policy | https://christian-codez.github.io/gridlens-for-bootstrap/privacy/ |
-> | Support | https://christian-codez.github.io/gridlens-for-bootstrap/support/ |
-> | Source | https://github.com/christian-codez/gridlens-for-bootstrap |
-> | Firefox add-on ID | `gridlens@christian-codez.github.io` |
->
-> Deliberately not published under an agency name or domain — see the trader
-> section below. The `gecko.id` is final once the add-on is first published to
-> AMO; changing it afterwards creates a *different* add-on and orphans existing
-> users, so leave it alone from here.
-
----|---|
-> | Homepage | https://christian-codez.github.io/gridlens-for-bootstrap/ |
-> | Privacy policy | https://christian-codez.github.io/gridlens-for-bootstrap/privacy/ |
-> | Support | https://christian-codez.github.io/gridlens-for-bootstrap/support/ |
-> | Source | https://github.com/christian-codez/gridlens-for-bootstrap |
-> | Firefox add-on ID | `gridlens@christian-codez.github.io` |
->
-> The `gecko.id` is final once the add-on is first published to AMO. Changing it
-> afterwards creates a *different* add-on and orphans existing users — leave it alone.
->
-
----
+> |---
 
 ## Name
 
@@ -49,14 +26,14 @@ Inspect Bootstrap layouts: grid overlay, live breakpoint readout, tooltip viewer
 ## Summary (Firefox AMO, 250 char max)
 
 ```
-A developer tool for working with Bootstrap. Overlay the 12-column grid, watch the active breakpoint change as you resize, reveal every tooltip on the page at once, and open any modal without hunting for its trigger. Works with Bootstrap 3, 4, and 5.
+A developer tool for working with Bootstrap. Overlay the 12-column grid, watch the active breakpoint change as you resize, reveal every tooltip on the page at once, and open any component without hunting for its trigger. Works with Bootstrap 3, 4 and 5.
 ```
 
 ## Detailed description (both stores)
 
 ```
 GridLens is a developer tool for building and debugging Bootstrap layouts. It puts
-three things a click away that otherwise mean digging through DevTools.
+a handful of things a click away that otherwise mean digging through DevTools.
 
 GRID OVERLAY
 Draw the 12-column grid over any Bootstrap page and see exactly where your
@@ -96,8 +73,7 @@ Sass.
 
 PRIVACY
 No analytics, no telemetry, no accounts, no servers. GridLens sends nothing
-anywhere. Your four settings are saved in your browser's own extension storage
-and nowhere else. Full policy: https://christian-codez.github.io/gridlens-for-bootstrap/privacy/
+anywhere. Your settings are saved in your browser's own extension storage and nowhere else. Full policy: https://christian-codez.github.io/gridlens-for-bootstrap/privacy/
 
 GridLens is an independent project. It is not affiliated with, endorsed by, or
 sponsored by the Bootstrap project or its maintainers.
@@ -186,9 +162,9 @@ The tab that most often causes a rejection. Every field below is required.
 ```
 GridLens is a developer tool that visually inspects Bootstrap layouts on a web
 page. It overlays the Bootstrap grid, reports the active responsive breakpoint,
-reveals tooltips, and opens modal dialogs so a developer can check their markup
-without stepping through the interface by hand. Every feature serves that one
-purpose: inspecting Bootstrap components on the page currently open.
+reveals tooltips, and opens Bootstrap components so a developer can check their
+markup without stepping through the interface by hand. Every feature serves that
+one purpose: inspecting Bootstrap components on the page currently open.
 ```
 
 ### Permission justifications
@@ -209,7 +185,8 @@ other data is written to storage.
 ```
 The extension's popup needs to send messages to the content script running in the
 tab the user is looking at in order to toggle the grid, query the current
-breakpoint, and list the modals on the page. activeTab scopes this to the single
+breakpoint, and list the Bootstrap components on the page. activeTab scopes this
+to the single
 tab the user has open at the moment they click the toolbar icon.
 ```
 
@@ -271,7 +248,7 @@ MIT — see `LICENSE` in the repository root.
 GridLens is a Bootstrap layout inspector with no network activity of any kind.
 
 Testing it needs a page that actually uses Bootstrap. The repository includes a
-demo page at demo/index.html covering all three features — open it from the
+demo page at demo/index.html covering every feature — open it from the
 filesystem, then:
 
   1. Grid tab      -> "Show Grid" draws the 12-column overlay; it should sit
