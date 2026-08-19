@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GridLens demo page</title>
+<link rel="canonical" href="https://christian-codez.github.io/gridlens-for-bootstrap/demo/">
+
+<!--
+  Test fixture for GridLens for Bootstrap.
+
+  Two jobs:
+    1. A surface to screenshot for the store listings, with no third-party
+       branding in frame.
+    2. Something a store reviewer can open to exercise every feature.
+
+  Bootstrap 5 is loaded from a CDN here. That is fine for a local demo file, but
+  note this page is NOT part of the extension package - the extension itself
+  loads no remote code. Exclude demo/ from the submission zip.
+-->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  body { padding-bottom: 4rem; }
+  .demo-band { background: #0b6e6b; color: #fff; padding: 2.5rem 0; margin-bottom: 2rem; }
+  .demo-band h1 { font-weight: 600; letter-spacing: -.02em; }
+  .col-demo > div {
+    background: rgba(11,110,107,.09);
+    border: 1px solid rgba(11,110,107,.3);
+    border-radius: .25rem;
+    padding: .75rem;
+    text-align: center;
+    font-size: .8rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  section { margin-bottom: 3rem; }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.6rem; height: 1.6rem; border-radius: 50%;
+    background: #0b6e6b; color: #fff; font-size: .8rem; font-weight: 700;
+    margin-right: .5rem; flex: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-band">
+  <div class="container">
+    <h1 class="mb-1">GridLens demo page</h1>
+    <p class="mb-0 opacity-75">A Bootstrap 5 page for testing the grid overlay, tooltip viewer, and component opener.</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ============ How to test ============ -->
+  <section>
+    <h2 class="h4 mb-3">How to test each feature</h2>
+    <ol class="list-unstyled">
+      <li class="d-flex mb-2"><span class="step-num">1</span><span><strong>Grid</strong> — click the GridLens icon, then <em>Show Grid</em>. The 12-column overlay appears and the breakpoint readout docks top-right. Resize the window and watch it change.</span></li>
+      <li class="d-flex mb-2"><span class="step-num">2</span><span><strong>Tooltips</strong> — switch to the Tooltips tab and click <em>Show All Tooltips</em>. All five below appear at once.</span></li>
+      <li class="d-flex mb-2"><span class="step-num">3</span><span><strong>Components</strong> — the Components tab lists everything on this page: modals, an offcanvas, a toast, a dropdown, tabs, accordion sections, a carousel and a popover. Several have no trigger anywhere on the page.</span></li>
+    </ol>
+  </section>
+
+  <!-- ============ Grid ============ -->
+  <section>
+    <h2 class="h4 mb-3">Grid — a standard <code>.container</code></h2>
+    <p class="text-secondary">Turn the overlay on and check that its columns line up with these. Any drift means the overlay geometry doesn't match Bootstrap's real container widths.</p>
+
+    <div class="row g-3 col-demo mb-3">
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+      <div class="col-1"><div>col-1</div></div>
+    </div>
+
+    <div class="row g-3 col-demo mb-3">
+      <div class="col-6"><div>col-6</div></div>
+      <div class="col-3"><div>col-3</div></div>
+      <div class="col-3"><div>col-3</div></div>
+    </div>
+
+    <p class="text-secondary mb-2"><small>Responsive columns — these re-flow at each breakpoint, so they're the useful ones to watch while resizing.</small></p>
+    <div class="row g-3 col-demo">
+      <div class="col-12 col-md-6 col-xl-3"><div>col-12 col-md-6 col-xl-3</div></div>
+      <div class="col-12 col-md-6 col-xl-3"><div>col-12 col-md-6 col-xl-3</div></div>
+      <div class="col-12 col-md-6 col-xl-3"><div>col-12 col-md-6 col-xl-3</div></div>
+      <div class="col-12 col-md-6 col-xl-3"><div>col-12 col-md-6 col-xl-3</div></div>
+    </div>
+  </section>
+
+  <!-- ============ Container fluid ============ -->
+  </div><!-- /.container -->
+
+  <div class="container-fluid">
+    <section>
+      <h2 class="h4 mb-3">Grid — a <code>.container-fluid</code></h2>
+      <p class="text-secondary">Full viewport width at every breakpoint. Switch <em>Container Type</em> to <code>.container-fluid</code> in the popup and the overlay should snap to these instead.</p>
+      <div class="row g-3 col-demo">
+        <div class="col-2"><div>col-2</div></div>
+        <div class="col-2"><div>col-2</div></div>
+        <div class="col-2"><div>col-2</div></div>
+        <div class="col-2"><div>col-2</div></div>
+        <div class="col-2"><div>col-2</div></div>
+        <div class="col-2"><div>col-2</div></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="container">
+
+
+  <!-- ============ Other components ============ -->
+  <section>
+    <h2 class="h4 mb-3">Other components — for the Components tab</h2>
+    <p class="text-secondary">Every one of these is drivable from the popup, including the ones with no visible trigger.</p>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <div class="dropdown">
+        <button class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown">A dropdown</button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">First item</a></li>
+          <li><a class="dropdown-item" href="#">Second item</a></li>
+        </ul>
+      </div>
+      <span class="btn btn-outline-secondary disabled">Offcanvas has no trigger</span>
+      <span class="btn btn-outline-secondary disabled">Toast has no trigger</span>
+    </div>
+
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabOne">Tab one</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabTwo">Tab two</button></li>
+    </ul>
+    <div class="tab-content mb-4">
+      <div class="tab-pane fade show active" id="tabOne"><p>First tab's content.</p></div>
+      <div class="tab-pane fade" id="tabTwo"><p>Second tab's content.</p></div>
+    </div>
+
+    <div class="accordion mb-4" id="demoAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accOne">Accordion section one</button></h2>
+        <div id="accOne" class="accordion-collapse collapse" data-bs-parent="#demoAccordion"><div class="accordion-body">Body of section one.</div></div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accTwo">Accordion section two</button></h2>
+        <div id="accTwo" class="accordion-collapse collapse" data-bs-parent="#demoAccordion"><div class="accordion-body">Body of section two.</div></div>
+      </div>
+    </div>
+
+    <div id="demoCarousel" class="carousel slide mb-4">
+      <div class="carousel-inner">
+        <div class="carousel-item active"><div class="bg-primary text-white p-5 text-center">Slide one</div></div>
+        <div class="carousel-item"><div class="bg-secondary text-white p-5 text-center">Slide two</div></div>
+        <div class="carousel-item"><div class="bg-dark text-white p-5 text-center">Slide three</div></div>
+      </div>
+    </div>
+
+    <p class="mb-0">
+      A <a href="#" data-bs-toggle="popover" data-bs-title="A popover" data-bs-content="Popovers are listed alongside everything else.">link with a popover</a>
+      — popovers are harder to inspect by hand than tooltips, so they are listed too.
+    </p>
+  </section>
+
+  <!-- ============ Tooltips ============ -->
+  <section>
+    <h2 class="h4 mb-3">Tooltips — five, in four placements</h2>
+    <p class="text-secondary">Revealing these one hover at a time is exactly the chore the Tooltips tab removes.</p>
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <button type="button" class="btn btn-outline-dark"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              data-bs-title="Placed on top">Top</button>
+
+      <button type="button" class="btn btn-outline-dark"
+              data-bs-toggle="tooltip" data-bs-placement="right"
+              data-bs-title="Placed on the right">Right</button>
+
+      <button type="button" class="btn btn-outline-dark"
+              data-bs-toggle="tooltip" data-bs-placement="bottom"
+              data-bs-title="Placed on the bottom">Bottom</button>
+
+      <button type="button" class="btn btn-outline-dark"
+              data-bs-toggle="tooltip" data-bs-placement="left"
+              data-bs-title="Placed on the left">Left</button>
+    </div>
+
+    <p class="mb-0">
+      An
+      <a href="#" data-bs-toggle="tooltip" data-bs-title="Tooltips work on inline elements too, not just buttons">inline link with a tooltip</a>
+      inside a paragraph — worth including because inline placement is where tooltip overflow bugs usually surface.
+    </p>
+  </section>
+
+  <!-- ============ Modals ============ -->
+  <section>
+    <h2 class="h4 mb-3">Modals — three, one unreachable</h2>
+    <p class="text-secondary">The third has no trigger button anywhere on this page. It's the case the Modal Opener exists for: GridLens finds it and opens it anyway.</p>
+
+    <div class="d-flex flex-wrap gap-2">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#demoModalPrimary">
+        Open first modal
+      </button>
+      <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#demoModalSettings">
+        Open second modal
+      </button>
+      <span class="btn btn-outline-secondary disabled">Third modal has no trigger</span>
+    </div>
+  </section>
+
+</div>
+
+
+<!-- Offcanvas and toast, both deliberately without a trigger on the page -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="demoOffcanvas">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">Unreachable offcanvas</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body"><p>Nothing on the page opens this. GridLens found it and opened it anyway.</p></div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="demoToast" class="toast" role="alert">
+    <div class="toast-header"><strong class="me-auto">Unreachable toast</strong></div>
+    <div class="toast-body">Same again — no trigger on the page, opened straight from the popup.</div>
+  </div>
+</div>
+
+<!-- Modal 1 -->
+<div class="modal fade" id="demoModalPrimary" tabindex="-1" aria-labelledby="demoModalPrimaryLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="demoModalPrimaryLabel">Welcome message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">A plain modal with a visible trigger button. GridLens lists it as <code>#demoModalPrimary</code>.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 2 -->
+<div class="modal fade" id="demoModalSettings" tabindex="-1" aria-labelledby="demoModalSettingsLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="demoModalSettingsLabel">Account settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>A larger modal containing form controls, so the overlay can be checked against content that isn't just text.</p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="demoName" class="form-label">Display name</label>
+            <input type="text" class="form-control" id="demoName" value="Ada Lovelace">
+          </div>
+          <div class="col-md-6">
+            <label for="demoRole" class="form-label">Role</label>
+            <select class="form-select" id="demoRole">
+              <option selected>Engineer</option>
+              <option>Designer</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal 3 - deliberately has no trigger anywhere on the page -->
+<div class="modal fade" id="demoModalOrphan" tabindex="-1" aria-labelledby="demoModalOrphanLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="demoModalOrphanLabel">Unreachable modal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0">Nothing on this page opens this one. If you're reading it, GridLens found <code>#demoModalOrphan</code> in the DOM and opened it directly — which is the whole point of the feature.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Bootstrap does not initialise tooltips automatically - opt in, as the docs require.
+  document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    .forEach(function (el) { new bootstrap.Tooltip(el); });
+  document.querySelectorAll('[data-bs-toggle="popover"]')
+    .forEach(function (el) { new bootstrap.Popover(el); });
+</script>
+</body>
+</html>

@@ -247,9 +247,16 @@ MIT — see `LICENSE` in the repository root.
 ```
 GridLens is a Bootstrap layout inspector with no network activity of any kind.
 
-Testing it needs a page that actually uses Bootstrap. The repository includes a
-demo page at demo/index.html covering every feature — open it from the
-filesystem, then:
+Testing it needs a page that actually uses Bootstrap. There is one covering every
+feature at
+
+  https://christian-codez.github.io/gridlens-for-bootstrap/demo/
+
+Please use that URL rather than opening demo/index.html from disk: extensions do
+not run on file:// URLs unless "Allow access to file URLs" is switched on for
+the extension, so a local copy will appear to do nothing until it is.
+
+With the demo open:
 
   1. Grid tab      -> "Show Grid" draws the 12-column overlay; it should sit
                       exactly on the demo page's real columns. Resize and the
