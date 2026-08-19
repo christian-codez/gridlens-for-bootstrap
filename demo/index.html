@@ -45,7 +45,7 @@
 <div class="demo-band">
   <div class="container">
     <h1 class="mb-1">GridLens demo page</h1>
-    <p class="mb-0 opacity-75">A Bootstrap 5 page for testing the grid overlay, tooltip viewer, and modal opener.</p>
+    <p class="mb-0 opacity-75">A Bootstrap 5 page for testing the grid overlay, tooltip viewer, and component opener.</p>
   </div>
 </div>
 
@@ -57,7 +57,7 @@
     <ol class="list-unstyled">
       <li class="d-flex mb-2"><span class="step-num">1</span><span><strong>Grid</strong> — click the GridLens icon, then <em>Show Grid</em>. The 12-column overlay appears and the breakpoint readout docks top-right. Resize the window and watch it change.</span></li>
       <li class="d-flex mb-2"><span class="step-num">2</span><span><strong>Tooltips</strong> — switch to the Tooltips tab and click <em>Show All Tooltips</em>. All five below appear at once.</span></li>
-      <li class="d-flex mb-2"><span class="step-num">3</span><span><strong>Modals</strong> — the Modals tab lists all three modals on this page. Pick one and click <em>Open Selected Modal</em>.</span></li>
+      <li class="d-flex mb-2"><span class="step-num">3</span><span><strong>Components</strong> — the Components tab lists everything on this page: modals, an offcanvas, a toast, a dropdown, tabs, accordion sections, a carousel and a popover. Several have no trigger anywhere on the page.</span></li>
     </ol>
   </section>
 
@@ -116,6 +116,58 @@
 
   <div class="container">
 
+
+  <!-- ============ Other components ============ -->
+  <section>
+    <h2 class="h4 mb-3">Other components — for the Components tab</h2>
+    <p class="text-secondary">Every one of these is drivable from the popup, including the ones with no visible trigger.</p>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <div class="dropdown">
+        <button class="btn btn-outline-dark dropdown-toggle" data-bs-toggle="dropdown">A dropdown</button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">First item</a></li>
+          <li><a class="dropdown-item" href="#">Second item</a></li>
+        </ul>
+      </div>
+      <span class="btn btn-outline-secondary disabled">Offcanvas has no trigger</span>
+      <span class="btn btn-outline-secondary disabled">Toast has no trigger</span>
+    </div>
+
+    <ul class="nav nav-tabs mb-3">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabOne">Tab one</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabTwo">Tab two</button></li>
+    </ul>
+    <div class="tab-content mb-4">
+      <div class="tab-pane fade show active" id="tabOne"><p>First tab's content.</p></div>
+      <div class="tab-pane fade" id="tabTwo"><p>Second tab's content.</p></div>
+    </div>
+
+    <div class="accordion mb-4" id="demoAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accOne">Accordion section one</button></h2>
+        <div id="accOne" class="accordion-collapse collapse" data-bs-parent="#demoAccordion"><div class="accordion-body">Body of section one.</div></div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accTwo">Accordion section two</button></h2>
+        <div id="accTwo" class="accordion-collapse collapse" data-bs-parent="#demoAccordion"><div class="accordion-body">Body of section two.</div></div>
+      </div>
+    </div>
+
+    <div id="demoCarousel" class="carousel slide mb-4">
+      <div class="carousel-inner">
+        <div class="carousel-item active"><div class="bg-primary text-white p-5 text-center">Slide one</div></div>
+        <div class="carousel-item"><div class="bg-secondary text-white p-5 text-center">Slide two</div></div>
+        <div class="carousel-item"><div class="bg-dark text-white p-5 text-center">Slide three</div></div>
+      </div>
+    </div>
+
+    <p class="mb-0">
+      A <a href="#" data-bs-toggle="popover" data-bs-title="A popover" data-bs-content="Popovers are listed alongside everything else.">link with a popover</a>
+      — popovers are harder to inspect by hand than tooltips, so they are listed too.
+    </p>
+  </section>
+
   <!-- ============ Tooltips ============ -->
   <section>
     <h2 class="h4 mb-3">Tooltips — five, in four placements</h2>
@@ -162,6 +214,23 @@
     </div>
   </section>
 
+</div>
+
+
+<!-- Offcanvas and toast, both deliberately without a trigger on the page -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="demoOffcanvas">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">Unreachable offcanvas</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body"><p>Nothing on the page opens this. GridLens found it and opened it anyway.</p></div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="demoToast" class="toast" role="alert">
+    <div class="toast-header"><strong class="me-auto">Unreachable toast</strong></div>
+    <div class="toast-body">Same again — no trigger on the page, opened straight from the popup.</div>
+  </div>
 </div>
 
 <!-- Modal 1 -->
@@ -237,6 +306,8 @@
   // Bootstrap does not initialise tooltips automatically - opt in, as the docs require.
   document.querySelectorAll('[data-bs-toggle="tooltip"]')
     .forEach(function (el) { new bootstrap.Tooltip(el); });
+  document.querySelectorAll('[data-bs-toggle="popover"]')
+    .forEach(function (el) { new bootstrap.Popover(el); });
 </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-# Store submission answers — GridLens for Bootstrap v1.9.1
+# Store submission answers — GridLens for Bootstrap v1.10.0
 
 Everything the Chrome and Firefox submission forms ask for, written out in advance.
 Copy from here into the forms rather than composing in the browser.
@@ -43,7 +43,7 @@ is descriptive nominative use rather than a claim of affiliation.
 ## Short description (Chrome, 132 char max — this is 121)
 
 ```
-Inspect Bootstrap layouts: 12-column grid overlay, live breakpoint readout, tooltip viewer, and modal opener.
+Inspect Bootstrap layouts: grid overlay, live breakpoint readout, tooltip viewer, and component opener.
 ```
 
 ## Summary (Firefox AMO, 250 char max)
@@ -80,9 +80,11 @@ Reveal every Bootstrap tooltip on the page at once, instead of hovering each
 element one at a time to check copy, positioning, and overflow. Detects whether
 the page runs Bootstrap 3, 4, or 5, with a manual override when you need it.
 
-MODAL OPENER
-Lists every modal on the page and opens the one you pick — no need to find the
-button that triggers it, or to fake application state to reach it.
+COMPONENT OPENER
+Lists every Bootstrap component on the page — modals, offcanvas panels, toasts,
+dropdowns, tabs, accordions, carousels and popovers — and opens the one you
+pick. No need to find the button that triggers it, or to fake application state
+to reach it. Components with no trigger anywhere on the page are listed too.
 
 CUSTOM BREAKPOINTS
 Ships with Bootstrap's defaults (xs, sm, md, lg, xl, xxl). If your project
@@ -279,7 +281,9 @@ filesystem, then:
   2. Tooltips tab  -> "Show All Tooltips" reveals all five tooltips at once.
                       The version readout should show the exact Bootstrap
                       version the demo page loads.
-  3. Modals tab    -> the dropdown lists three modals; picking one opens it.
+  3. Components tab -> the dropdown lists twelve components grouped by kind.
+                      Picking any one opens it, including the modal, offcanvas
+                      and toast that nothing on the page triggers.
 
 On permissions: the content script matches <all_urls> because a developer using
 this tool may be working on any origin — localhost, staging, a client's domain.
@@ -372,7 +376,7 @@ Five are built and ready in `store-assets/`, at 2560×1600 (2× of 1280×800):
 |---|---|
 | `1-grid.png` | Grid overlay on a real `.container`, popup on the Grid tab |
 | `2-tooltips.png` | All five tooltips revealed at once |
-| `3-modals.png` | The trigger-less modal opened from the Modals tab |
+| `3-components.png` | The trigger-less modal opened from the Components tab |
 | `4-fluid.png` | `.container-fluid` overlay |
 | `5-breakpoints.png` | The breakpoints editor, import/export |
 

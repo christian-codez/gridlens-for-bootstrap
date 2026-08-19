@@ -52,8 +52,8 @@
       case 'GRIDLENS_HIDE_TOOLTIPS':
         hideTooltips();
         break;
-      case 'GRIDLENS_OPEN_MODAL':
-        openModal(data.modalId);
+      case 'GRIDLENS_OPEN_COMPONENT':
+        openComponent(data);
         break;
     }
   });
@@ -264,57 +264,84 @@
     });
   }
 
-  // ===== MODAL FUNCTIONS =====
+  // ===== COMPONENT FUNCTIONS =====
+  //
+  // Every Bootstrap JS component extends one base class providing
+  // getOrCreateInstance(), so the whole set is drivable through one map. The
+  // jQuery entries cover Bootstrap 3 and 4, where components are registered as
+  // jQuery plugins instead.
+  //
+  // Carousel gets cycle() rather than show(): starting playback is the useful
+  // equivalent of "open this" for a carousel. Offcanvas has no jQuery entry
+  // because it does not exist before Bootstrap 5.
+  const OPENERS = {
+    modal:     { cls: 'Modal',     jq: (el) => $(el).modal('show') },
+    offcanvas: { cls: 'Offcanvas', jq: null },
+    toast:     { cls: 'Toast',     jq: (el) => $(el).toast('show') },
+    dropdown:  { cls: 'Dropdown',  jq: (el) => $(el).dropdown('toggle') },
+    tab:       { cls: 'Tab',       jq: (el) => $(el).tab('show') },
+    collapse:  { cls: 'Collapse',  jq: (el) => $(el).collapse('show') },
+    carousel:  { cls: 'Carousel',  jq: (el) => $(el).carousel('cycle'), method: 'cycle' },
+    popover:   { cls: 'Popover',   jq: (el) => $(el).popover('show') }
+  };
 
-  // Returns the Bootstrap instance already managing this modal, whichever major
-  // version put it there, or null if the page has no Bootstrap JS driving it.
-  function modalInstanceFor(modal) {
-    try {
-      if (typeof bootstrap !== 'undefined' && bootstrap.Modal && bootstrap.Modal.getInstance) {
-        const instance = bootstrap.Modal.getInstance(modal);
-        if (instance) return { kind: 'bs5', instance: instance };
-      }
-    } catch (e) { /* fall through */ }
+  // Overlays own the screen, so opening one should close any other. The rest -
+  // toasts, dropdowns, tabs, accordions - legitimately coexist and are left
+  // alone.
+  const OVERLAY_TYPES = { modal: true, offcanvas: true };
+
+  const OVERLAY_SELECTOR = '.modal, .offcanvas';
+
+  function instanceFor(el) {
+    // Whichever Bootstrap put it there, or null if the page has no Bootstrap JS
+    // driving this element.
+    for (const name of ['Modal', 'Offcanvas', 'Toast', 'Dropdown', 'Tab', 'Collapse', 'Carousel', 'Popover']) {
+      try {
+        const ctor = typeof bootstrap !== 'undefined' && bootstrap[name];
+        if (ctor && ctor.getInstance) {
+          const instance = ctor.getInstance(el);
+          if (instance) return { kind: 'bs5', instance: instance };
+        }
+      } catch (e) { /* try the next */ }
+    }
 
     try {
       if (typeof Modal !== 'undefined' && Modal.getInstance) {
-        const instance = Modal.getInstance(modal);
+        const instance = Modal.getInstance(el);
         if (instance) return { kind: 'bs5', instance: instance };
       }
     } catch (e) { /* fall through */ }
 
     try {
-      if (typeof $ !== 'undefined' && $.fn && $.fn.modal) {
-        const data = $(modal).data('bs.modal');
-        if (data) return { kind: 'jquery', instance: $(modal) };
+      if (typeof $ !== 'undefined' && $.fn && $.fn.modal && ($(el).data('bs.modal') || $(el).data('bs.offcanvas'))) {
+        return { kind: 'jquery', instance: $(el) };
       }
     } catch (e) { /* fall through */ }
 
     return null;
   }
 
-  function isOpen(modal) {
-    return modal.classList.contains('show') ||
-           modal.classList.contains('in') ||        // Bootstrap 3
-           modal.getAttribute('aria-modal') === 'true';
+  function isOpen(el) {
+    return el.classList.contains('show') ||
+           el.classList.contains('in') ||        // Bootstrap 3
+           el.getAttribute('aria-modal') === 'true';
   }
 
-  // Closes whatever is open and calls done() once the page has actually
+  // Closes any open overlay and calls done() once the page has actually
   // finished closing it.
   //
-  // The previous version called hide() and then immediately force-wrote
-  // display:none, stripped .show, removed every backdrop and dropped
-  // body.modal-open. hide() is asynchronous - Bootstrap drives it through a CSS
-  // fade and cleans up in its own transition handler - so that raced its
-  // teardown. The visible results were an inline display:none stuck on a modal
-  // the page later tried to open itself, and a body left scroll-locked because
-  // Bootstrap re-added the class after we removed it.
+  // An earlier version called hide() and immediately force-wrote display:none,
+  // stripped .show, removed every backdrop and dropped body.modal-open. hide()
+  // is asynchronous - Bootstrap drives it through a CSS fade and cleans up in
+  // its own transition handler - so that raced its teardown, leaving an inline
+  // display:none on a modal the page later tried to reopen and a body stuck
+  // scroll-locked.
   //
-  // So: if the page is managing a modal, ask it to close and wait for its own
-  // "finished" event. Only modals with no instance at all get cleaned up by
+  // So: if the page is managing an overlay, ask it to close and wait for its
+  // own "finished" event. Only overlays with no instance get cleaned up by
   // hand, because nothing else is going to do it.
-  function closeAllModals(done) {
-    const open = Array.from(document.querySelectorAll('.modal')).filter(isOpen);
+  function closeOverlays(done) {
+    const open = Array.from(document.querySelectorAll(OVERLAY_SELECTOR)).filter(isOpen);
 
     if (!open.length) {
       done();
@@ -324,36 +351,39 @@
     let pending = 0;
     let settled = false;
     let forced = false;
+    const retries = [];
 
     function finish() {
       if (settled) return;
       settled = true;
+      retries.forEach(clearInterval);
 
-      // Deliberately does not force a Bootstrap-managed modal shut, even if it
-      // is somehow still open by now.
+      // Deliberately does not force a Bootstrap-managed overlay shut, even if
+      // one is somehow still open by now.
       //
-      // Ripping the classes off one leaves Bootstrap's internal _isShown true,
-      // so every later show() on that modal returns early and the page can
-      // never open it again - a permanent break in exchange for tidying a
-      // transient one. Its teardown also runs afterwards and would strip the
-      // backdrop and body lock belonging to whichever modal we just opened.
+      // Ripping the classes off leaves Bootstrap's internal _isShown true, so
+      // every later show() on that element returns early and the page can never
+      // open it again - a permanent break in exchange for tidying a transient
+      // one. Its teardown also runs afterwards and would strip the backdrop and
+      // body lock belonging to whichever overlay we just opened.
       //
-      // So if a close overruns, we proceed and let Bootstrap finish in its own
+      // If a close overruns we proceed and let Bootstrap finish in its own
       // time. Worst case is a brief second backdrop that clears itself.
 
-      // Clean up only after modals nothing on the page was managing: there is
+      // Clean up only after overlays nothing on the page was managing: there is
       // no instance coming along later to do it.
       if (forced) {
-        document.querySelectorAll('.modal-backdrop').forEach(function (b) { b.remove(); });
-        document.body.classList.remove('modal-open');
+        document.querySelectorAll('.modal-backdrop, .offcanvas-backdrop').forEach(function (b) { b.remove(); });
+        document.body.classList.remove('modal-open', 'offcanvas-open');
         document.body.style.removeProperty('padding-right');
+        document.body.style.removeProperty('overflow');
       }
 
       done();
     }
 
-    // Bootstrap's fade is 300ms. This only exists so a modal whose transition
-    // never fires cannot hang the open forever.
+    // Bootstrap's fade is 300ms. This only exists so an overlay whose
+    // transition never fires cannot hang the open forever.
     const guard = setTimeout(finish, 1500);
 
     function settle() {
@@ -364,29 +394,60 @@
       }
     }
 
-    open.forEach(function (modal) {
-      const found = modalInstanceFor(modal);
+    function askToHide(found) {
+      if (found.kind === 'jquery') found.instance.modal('hide');
+      else found.instance.hide();
+    }
+
+    open.forEach(function (el) {
+      const found = instanceFor(el);
 
       if (found) {
         pending++;
-        modal.addEventListener('hidden.bs.modal', settle, { once: true });
-        try {
-          if (found.kind === 'jquery') found.instance.modal('hide');
-          else found.instance.hide();
-        } catch (e) {
-          modal.removeEventListener('hidden.bs.modal', settle);
+        let done = false;
+
+        const onHidden = function () {
+          if (done) return;
+          done = true;
+          clearInterval(retry);
           settle();
+        };
+        el.addEventListener('hidden.bs.modal', onHidden, { once: true });
+        el.addEventListener('hidden.bs.offcanvas', onHidden, { once: true });
+
+        // Bootstrap's hide() opens with
+        //   if (!this._isShown || this._isTransitioning) return
+        // so asking an overlay to close while it is still fading in does
+        // nothing at all - silently. Clicking the extension within the 300ms
+        // a modal takes to open lands exactly there, and the old code then sat
+        // waiting for a hidden event that was never coming, gave up, and opened
+        // the next overlay on top of the first.
+        //
+        // Rather than reading Bootstrap's private transition flag, just ask
+        // again until it takes. Once the transition ends the next attempt
+        // succeeds and the hidden event arrives.
+        const retry = setInterval(function () {
+          if (done) { clearInterval(retry); return; }
+          if (!isOpen(el)) { onHidden(); return; }
+          try { askToHide(found); } catch (e) { onHidden(); }
+        }, 120);
+        retries.push(retry);
+
+        try {
+          askToHide(found);
+        } catch (e) {
+          onHidden();
         }
         return;
       }
 
       // No instance: nothing on the page owns this, so undo by hand what the
-      // fallback path in openModal did.
+      // fallback path below did.
       forced = true;
-      modal.classList.remove('show', 'in');
-      modal.style.display = 'none';
-      modal.setAttribute('aria-hidden', 'true');
-      modal.removeAttribute('aria-modal');
+      el.classList.remove('show', 'in');
+      el.style.display = 'none';
+      el.setAttribute('aria-hidden', 'true');
+      el.removeAttribute('aria-modal');
     });
 
     if (pending === 0) {
@@ -395,91 +456,90 @@
     }
   }
 
-  function openModal(modalId) {
-    const modalElement = document.getElementById(modalId);
+  // Resolves the element the content script scanned.
+  //
+  // Id first, because it survives the DOM changing between the scan and the
+  // click. Index into the same selector is the fallback, which is all there is
+  // for the many dropdowns and tabs that carry no id.
+  function resolveElement(data) {
+    if (data.id) {
+      const byId = document.getElementById(data.id);
+      if (byId) return byId;
+    }
+    if (typeof data.selector === 'string' && typeof data.index === 'number') {
+      return document.querySelectorAll(data.selector)[data.index] || null;
+    }
+    return null;
+  }
 
-    if (!modalElement) {
-      postToPage({
-        type: 'GRIDLENS_MODAL_ERROR',
-        error: 'Modal not found'
-    });
+  function openComponent(data) {
+    const spec = OPENERS[data.componentType];
+    if (!spec) {
+      postToPage({ type: 'GRIDLENS_COMPONENT_ERROR', error: 'Unknown component type' });
       return;
     }
 
-    // Wait for anything already open to finish closing. Opening on top of a
-    // half-torn-down modal is how you end up with two backdrops.
-    closeAllModals(function () {
-      showModal(modalElement, modalId);
-    });
+    const el = resolveElement(data);
+    if (!el) {
+      postToPage({ type: 'GRIDLENS_COMPONENT_ERROR', error: 'Component not found on the page' });
+      return;
+    }
+
+    if (OVERLAY_TYPES[data.componentType]) {
+      closeOverlays(function () { showComponent(el, spec, data.componentType); });
+    } else {
+      showComponent(el, spec, data.componentType);
+    }
   }
 
-  function showModal(modalElement, modalId) {
+  function showComponent(el, spec, type) {
+    const method = spec.method || 'show';
     let success = false;
-    
-    // Try Bootstrap 5
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+
+    // Bootstrap 5: one shape for every component.
+    if (typeof bootstrap !== 'undefined' && bootstrap[spec.cls]) {
       try {
-        let instance = bootstrap.Modal.getInstance(modalElement);
-        if (!instance) {
-          instance = new bootstrap.Modal(modalElement);
-        }
-        instance.show();
+        bootstrap[spec.cls].getOrCreateInstance(el)[method]();
         success = true;
       } catch (e) {
-        console.warn('Bootstrap 5 modal open failed:', e);
+        console.warn('GridLens: Bootstrap 5 ' + type + ' failed', e);
       }
     }
-    
-    // Try Bootstrap 4/3 with jQuery
-    if (!success && typeof $ !== 'undefined' && $.fn && $.fn.modal) {
+
+    // Bootstrap 3 and 4 register components as jQuery plugins instead.
+    if (!success && spec.jq && typeof $ !== 'undefined' && $.fn) {
       try {
-        $(modalElement).modal('show');
+        spec.jq(el);
         success = true;
       } catch (e) {
-        console.warn('jQuery modal open failed:', e);
+        console.warn('GridLens: jQuery ' + type + ' failed', e);
       }
     }
-    
-    // Try standalone Modal class (some Bootstrap builds)
-    if (!success && typeof Modal !== 'undefined') {
+
+    // Last resort, and only for modals: a page can load Bootstrap's CSS without
+    // its JavaScript, and a modal is the one component whose open state is
+    // purely presentational enough to fake convincingly.
+    if (!success && type === 'modal') {
       try {
-        let instance = Modal.getInstance(modalElement);
-        if (!instance) {
-          instance = new Modal(modalElement);
-        }
-        instance.show();
-        success = true;
-      } catch (e) {
-        console.warn('Modal class open failed:', e);
-      }
-    }
-    
-    // Fallback: manually show modal with CSS
-    if (!success) {
-      try {
-        modalElement.classList.add('show');
-        modalElement.style.display = 'block';
-        modalElement.setAttribute('aria-hidden', 'false');
-        
-        // Add backdrop
-        let backdrop = document.querySelector('.modal-backdrop');
-        if (!backdrop) {
-          backdrop = document.createElement('div');
+        el.classList.add('show');
+        el.style.display = 'block';
+        el.setAttribute('aria-hidden', 'false');
+        if (!document.querySelector('.modal-backdrop')) {
+          const backdrop = document.createElement('div');
           backdrop.className = 'modal-backdrop fade show';
           document.body.appendChild(backdrop);
         }
-        
         document.body.classList.add('modal-open');
         success = true;
       } catch (e) {
-        console.warn('Manual modal open failed:', e);
+        console.warn('GridLens: manual modal open failed', e);
       }
     }
-    
+
     postToPage({
-      type: 'GRIDLENS_MODAL_OPENED',
+      type: 'GRIDLENS_COMPONENT_OPENED',
       success: success,
-      modalId: modalId
+      componentType: type
     });
   }
 

@@ -10,7 +10,7 @@
   <div class="container">
     <header>
       <h1><span class="icon icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 21 21"/><path d="M10.5 4v13M4 10.5h13" stroke-width="1.1" opacity=".55"/></svg></span>GridLens</h1>
-      <p class="subtitle">Grid • Tooltips • Modals</p>
+      <p class="subtitle">Grid • Tooltips • Components</p>
     </header>
 
     <!-- Tab Navigation -->
@@ -23,9 +23,9 @@
         <span class="tab-icon icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 11.4a7.9 7.9 0 0 1-8.5 7.9 9 9 0 0 1-2.5-.4L4.5 20.5l1.4-4.4a7.7 7.7 0 0 1-1.4-4.7 7.9 7.9 0 0 1 8-7.9 7.9 7.9 0 0 1 8 7.9z"/><path d="M8.8 11.4h.01M12 11.4h.01M15.2 11.4h.01" stroke-width="2.1"/></svg></span>
         <span class="tab-text">Tooltips</span>
       </button>
-      <button class="tab-btn" data-tab="modals">
+      <button class="tab-btn" data-tab="components">
         <span class="tab-icon icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.75" y="4.75" width="18.5" height="14.5" rx="2"/><path d="M2.75 9.25h18.5"/><path d="M5.9 7h.01M8.4 7h.01" stroke-width="1.9"/></svg></span>
-        <span class="tab-text">Modals</span>
+        <span class="tab-text">Components</span>
       </button>
     </nav>
 
@@ -171,39 +171,39 @@
       </div>
     </section>
 
-    <!-- Modals Panel -->
-    <section id="modals-panel" class="panel">
+    <!-- Components Panel -->
+    <section id="components-panel" class="panel">
       <div class="panel-content">
-        <div class="modal-select-section">
-          <label for="modal-select" class="setting-label">Select a Modal:</label>
-          <select id="modal-select" class="modal-select">
-            <option value="">-- Scanning for modals... --</option>
+        <div class="component-select-section">
+          <label for="component-select" class="setting-label">Select a component:</label>
+          <select id="component-select" class="component-select">
+            <option value="">-- Scanning the page… --</option>
           </select>
         </div>
 
-        <button id="openModal" class="btn-toggle">
+        <button id="openComponent" class="btn-toggle">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.75" y="4.75" width="18.5" height="14.5" rx="2"/><path d="M2.75 9.25h18.5"/><path d="M5.9 7h.01M8.4 7h.01" stroke-width="1.9"/></svg></span>
-          <span>Open Selected Modal</span>
+          <span>Open selected</span>
         </button>
 
         <div class="status-box">
           <div class="status-item">
-            <span class="label">Modals found:</span>
-            <span id="modal-count" class="value">-</span>
+            <span class="label">Components found:</span>
+            <span id="component-count" class="value">-</span>
           </div>
           <div class="status-item">
             <span class="label">Bootstrap version:</span>
-            <span id="modal-bs-version" class="value">-</span>
+            <span id="component-bs-version" class="value">-</span>
           </div>
         </div>
 
-        <button id="refreshModals" class="btn-secondary-small btn-full">
-          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5v5h-5"/></svg></span><span>Refresh Modal List</span>
+        <button id="refreshComponents" class="btn-secondary-small btn-full">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5v5h-5"/></svg></span><span>Rescan page</span>
         </button>
 
         <div class="info-box">
-          <p><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 18.5h5M10.5 21.5h3"/><path d="M12 2.5a6 6 0 0 0-3.5 10.9 2.6 2.6 0 0 1 1 1.7l.1.9h4.8l.1-.9a2.6 2.6 0 0 1 1-1.7A6 6 0 0 0 12 2.5z"/></svg></span>Select a modal from the dropdown and click "Open" to display it.</p>
-          <p class="note">Works with Bootstrap 3, 4, and 5 modals!</p>
+          <p><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 18.5h5M10.5 21.5h3"/><path d="M12 2.5a6 6 0 0 0-3.5 10.9 2.6 2.6 0 0 1 1 1.7l.1.9h4.8l.1-.9a2.6 2.6 0 0 1 1-1.7A6 6 0 0 0 12 2.5z"/></svg></span>Modals, offcanvas panels, toasts, dropdowns, tabs, accordions, carousels and popovers — including any with no trigger on the page.</p>
+          <p class="note">Works with Bootstrap 3, 4 and 5.</p>
         </div>
       </div>
     </section>

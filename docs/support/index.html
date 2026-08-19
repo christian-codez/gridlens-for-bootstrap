@@ -93,6 +93,11 @@
 <h3>Switching container type doesn't seem to change anything</h3>
 <p>Three things to check. Below 576px wide, <code>.container</code> is full-width anyway, so it and <code>.container-fluid</code> are genuinely identical — widen the window and the difference appears. The overlay also has to be switched on to see any change to it. And if you loaded the extension from source, reload it at <code>chrome://extensions</code> after updating; the version shown at the bottom of the popup tells you which build is actually running.</p>
 
+<h3>Which components can GridLens open?</h3>
+<p>Modals, offcanvas panels, toasts, dropdowns, tabs and pills, collapse sections and accordions, carousels, and popovers — everything Bootstrap drives with JavaScript. They are grouped by kind in the Components tab, and listed whether or not anything on the page opens them.</p>
+<p>Opening a modal or offcanvas closes whichever one was already open first, since only one can own the screen. The rest — toasts, dropdowns, tabs, accordions — are left alone, because they legitimately coexist.</p>
+<p>Components that only exist in newer Bootstrap versions simply do not appear on older pages: no offcanvas on Bootstrap 4, no toast on Bootstrap 3.</p>
+
 <h3>Tooltips or modals don't respond</h3>
 <p>Confirm the page actually uses Bootstrap's JavaScript, not just its stylesheet. The Tooltips tab reports how Bootstrap was detected — hover the version readout. If it says the stylesheet or the markup rather than the JavaScript, the page has no Bootstrap JS for the extension to drive, so the grid overlay works but tooltips fall back to a simple renderer and modals may not open.</p>
 

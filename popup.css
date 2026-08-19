@@ -766,11 +766,11 @@ header h1 {
 }
 
 /* Modal Section */
-.modal-select-section {
+.component-select-section {
   margin-bottom: 14px;
 }
 
-.modal-select {
+.component-select {
   width: 100%;
   padding: 12px;
   border: 2px solid var(--gl-accent);
@@ -787,25 +787,25 @@ header h1 {
   padding-right: 36px;
 }
 
-.modal-select:hover:not(:disabled) {
+.component-select:hover:not(:disabled) {
   border-color: var(--gl-accent-strong);
   box-shadow: 0 0 0 3px var(--gl-accent-tint);
 }
 
-.modal-select:focus {
+.component-select:focus {
   outline: none;
   border-color: var(--gl-accent-strong);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 
-.modal-select:disabled {
+.component-select:disabled {
   background-color: var(--gl-surface-2);
   border-color: var(--gl-rule);
   color: var(--gl-faint);
   cursor: not-allowed;
 }
 
-.modal-select option {
+.component-select option {
   padding: 10px;
 }
 
@@ -877,6 +877,18 @@ header h1 {
   outline: 2px solid var(--gl-accent);
   outline-offset: 1px;
 }
+
+/* Native optgroups render with the OS's own list styling, which on a dark
+   popup means near-black text on near-black. Both need setting explicitly. */
+.component-select optgroup {
+  background: var(--gl-surface-2);
+  color: var(--gl-faint);
+  font-style: normal;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+
 
 #container-hint {
   margin-top: 6px;

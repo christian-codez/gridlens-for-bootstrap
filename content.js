@@ -607,37 +607,133 @@
   }
 
   // =============================================
-  // MODAL OPENER MODULE
+  // COMPONENT SCANNER MODULE
   // =============================================
-  
-  function findAllModals() {
-    const modals = [];
-    const version = detectBootstrapVersion();
-    
-    // Bootstrap 5 modals
-    document.querySelectorAll('.modal[id]').forEach(modal => {
-      const titleEl = modal.querySelector('.modal-title');
-      modals.push({
-        id: modal.id,
-        title: titleEl ? titleEl.textContent.trim() : '',
-        element: modal
-      });
-    });
-    
-    return { modals, version };
+  //
+  // Every Bootstrap JS component extends one base class that provides
+  // getOrCreateInstance(), so driving an offcanvas is the same shape as driving
+  // a modal. This used to handle modals alone, which was one twelfth of the job.
+  //
+  // Selectors are deliberately version-agnostic: querying both data-bs-toggle
+  // and data-toggle costs nothing and means a page gets found whether it runs
+  // Bootstrap 3, 4 or 5. Components that only exist in later versions simply
+  // return nothing on older pages.
+  //
+  // `group` is the optgroup heading in the popup. `label` builds the human name
+  // for one element - the text a developer would recognise it by, falling back
+  // to its id.
+  const COMPONENT_TYPES = [
+    {
+      type: 'modal',
+      group: 'Modals',
+      selector: '.modal',
+      label: (el) => text(el.querySelector('.modal-title'))
+    },
+    {
+      type: 'offcanvas',
+      group: 'Offcanvas',
+      selector: '.offcanvas',
+      label: (el) => text(el.querySelector('.offcanvas-title'))
+    },
+    {
+      type: 'toast',
+      group: 'Toasts',
+      selector: '.toast',
+      label: (el) => text(el.querySelector('.toast-header')) || text(el.querySelector('.toast-body'))
+    },
+    {
+      type: 'dropdown',
+      group: 'Dropdowns',
+      selector: '[data-bs-toggle="dropdown"], [data-toggle="dropdown"]',
+      label: (el) => text(el)
+    },
+    {
+      type: 'tab',
+      group: 'Tabs & pills',
+      selector: '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-toggle="tab"], [data-toggle="pill"]',
+      label: (el) => text(el)
+    },
+    {
+      type: 'collapse',
+      group: 'Collapse & accordions',
+      selector: '.collapse',
+      // An accordion section is best named by its button, which lives outside
+      // the collapsing element and points at it.
+      label: (el) => {
+        if (el.id) {
+          const trigger = document.querySelector(
+            '[data-bs-target="#' + cssEscape(el.id) + '"], [data-target="#' + cssEscape(el.id) + '"], [href="#' + cssEscape(el.id) + '"]'
+          );
+          if (trigger) return text(trigger);
+        }
+        return el.classList.contains('navbar-collapse') ? 'Navbar menu' : '';
+      }
+    },
+    {
+      type: 'carousel',
+      group: 'Carousels',
+      selector: '.carousel',
+      label: (el) => {
+        const n = el.querySelectorAll('.carousel-item').length;
+        return n ? n + ' slides' : '';
+      }
+    },
+    {
+      type: 'popover',
+      group: 'Popovers',
+      selector: '[data-bs-toggle="popover"], [data-toggle="popover"]',
+      label: (el) => text(el)
+    }
+  ];
+
+  function text(el) {
+    if (!el) return '';
+    return (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 60);
   }
 
-  function openModal(modalId) {
-    const version = detectBootstrapVersion();
-    const modalElement = document.getElementById(modalId);
-    
-    if (!modalElement) {
-      return { success: false, error: `Modal with ID "${modalId}" not found` };
-    }
-    
-    // Send message to injected script to open modal in page context
-    postToPage({ type: 'GRIDLENS_OPEN_MODAL', modalId: modalId });
-    
+  // CSS.escape isn't in every engine this may run on, and the ids being escaped
+  // come from arbitrary page markup.
+  function cssEscape(value) {
+    if (window.CSS && CSS.escape) return CSS.escape(value);
+    return String(value).replace(/[^\w-]/g, '\\$&');
+  }
+
+  function findAllComponents() {
+    const found = [];
+
+    COMPONENT_TYPES.forEach(spec => {
+      // Index is within this selector's own result set, which is what the page
+      // world re-queries to resolve the element. Ids are preferred when present
+      // because they survive the DOM changing between scan and open.
+      Array.from(document.querySelectorAll(spec.selector)).forEach((el, index) => {
+        found.push({
+          type: spec.type,
+          group: spec.group,
+          index: index,
+          id: el.id || '',
+          label: spec.label(el) || ''
+        });
+      });
+    });
+
+    return { components: found, version: detectBootstrapVersion() };
+  }
+
+  function openComponent(request) {
+    const spec = COMPONENT_TYPES.find(c => c.type === request.componentType);
+    if (!spec) return { success: false, error: 'Unknown component type' };
+
+    // The selector travels with the request rather than being duplicated in the
+    // page-world script. Index resolution only works if both sides query
+    // exactly the same set, and two copies of a selector list is a drift bug
+    // waiting to happen.
+    postToPage({
+      type: 'GRIDLENS_OPEN_COMPONENT',
+      componentType: request.componentType,
+      selector: spec.selector,
+      index: request.index,
+      id: request.id || ''
+    });
     return { success: true };
   }
 
@@ -736,18 +832,17 @@
       sendResponse({ success: true, available: gridAvailable() });
     }
     
-    // Modal actions
-    else if (request.action === 'getModals') {
-      const result = findAllModals();
-      sendResponse({ 
-        modals: result.modals.map(m => ({ id: m.id, title: m.title })),
+    // Component actions
+    else if (request.action === 'getComponents') {
+      const result = findAllComponents();
+      sendResponse({
+        components: result.components,
         version: result.version,
         exactVersion: detectedBootstrap.exact
       });
     }
-    else if (request.action === 'openModal') {
-      const result = openModal(request.modalId);
-      sendResponse(result);
+    else if (request.action === 'openComponent') {
+      sendResponse(openComponent(request));
     }
     
     // Every branch above answers synchronously. Returning true would tell the

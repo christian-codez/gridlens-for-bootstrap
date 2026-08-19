@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSettings();
   setupGridPanel();
   setupTooltipsPanel();
-  setupModalsPanel();
+  setupComponentsPanel();
   setupCollapsibles();
   setupBreakpointIO();
   
@@ -70,8 +70,8 @@ function setupTabs() {
       // Refresh panel-specific data
       if (tabId === 'tooltips') {
         updateTooltipStatus();
-      } else if (tabId === 'modals') {
-        refreshModalsList();
+      } else if (tabId === 'components') {
+        refreshComponentList();
       }
     });
   });
@@ -797,41 +797,45 @@ function updateTooltipStatus() {
   });
 }
 
-// ===== MODALS PANEL =====
-function setupModalsPanel() {
-  document.getElementById('openModal').addEventListener('click', openSelectedModal);
-  document.getElementById('refreshModals').addEventListener('click', refreshModalsList);
-  
-  // Also open modal on double-click of select
-  document.getElementById('modal-select').addEventListener('dblclick', openSelectedModal);
-  
-  refreshModalsList();
+// ===== COMPONENTS PANEL =====
+
+// The scan result, flat. Options carry an index into this rather than trying to
+// encode a component reference in a value string.
+let componentList = [];
+
+function setupComponentsPanel() {
+  document.getElementById('openComponent').addEventListener('click', openSelectedComponent);
+  document.getElementById('refreshComponents').addEventListener('click', refreshComponentList);
+  document.getElementById('component-select').addEventListener('dblclick', openSelectedComponent);
+
+  refreshComponentList();
 }
 
-function openSelectedModal() {
-  const selectEl = document.getElementById('modal-select');
-  const modalId = selectEl.value;
-  
-  if (!modalId) {
-    showStatus('Please select a modal first', 'error');
+function openSelectedComponent() {
+  const selectEl = document.getElementById('component-select');
+  const entry = componentList[Number(selectEl.value)];
+
+  if (!entry) {
+    showStatus('Pick a component first', 'error');
     return;
   }
-  
-  sendMessageToTab({ action: 'openModal', modalId }).then(response => {
-    if (response.success) {
-      const selectedOption = selectEl.options[selectEl.selectedIndex];
-      showStatus(`Modal "${selectedOption.text}" opened!`);
+
+  sendMessageToTab({
+    action: 'openComponent',
+    componentType: entry.type,
+    index: entry.index,
+    id: entry.id
+  }).then(response => {
+    if (response && response.success) {
+      showStatus('Opened ' + describeComponent(entry));
     } else {
-      showStatus(response.error || 'Could not open modal', 'error');
+      showStatus((response && response.error) || 'Could not open that', 'error');
     }
-  }).catch(err => {
-    showStatus('Could not open modal', 'error');
-  });
+  }).catch(() => showStatus('Could not open that', 'error'));
 }
 
-// Replaces the select's contents with a single non-selectable message.
-// Modal IDs and titles come from arbitrary page markup, so every option in this
-// file is built with createElement and textContent - nothing here parses as HTML.
+// Labels come from arbitrary page markup, so every option here is built with
+// createElement and textContent - nothing in this file parses as HTML.
 function setSelectMessage(selectEl, message) {
   const option = document.createElement('option');
   option.value = '';
@@ -839,53 +843,77 @@ function setSelectMessage(selectEl, message) {
   selectEl.replaceChildren(option);
 }
 
-function refreshModalsList() {
-  const selectEl = document.getElementById('modal-select');
-  const countEl = document.getElementById('modal-count');
-  const versionEl = document.getElementById('modal-bs-version');
-  const openBtn = document.getElementById('openModal');
+// What to call one component in a list. The id is the developer-facing handle
+// where there is one; the label is whatever text identifies it on screen.
+function describeComponent(entry) {
+  if (entry.id && entry.label) return '#' + entry.id + ' — ' + entry.label;
+  if (entry.id) return '#' + entry.id;
+  if (entry.label) return entry.label;
+  return entry.type + ' ' + (entry.index + 1);
+}
 
-  setSelectMessage(selectEl, '-- Scanning... --');
+function refreshComponentList() {
+  const selectEl = document.getElementById('component-select');
+  const countEl = document.getElementById('component-count');
+  const versionEl = document.getElementById('component-bs-version');
+  const openBtn = document.getElementById('openComponent');
+
+  setSelectMessage(selectEl, '-- Scanning… --');
   selectEl.disabled = true;
   openBtn.disabled = true;
 
-  sendMessageToTab({ action: 'getModals' }).then(response => {
-    countEl.textContent = response.modals.length;
-
+  sendMessageToTab({ action: 'getComponents' }).then(response => {
+    componentList = (response && response.components) || [];
+    countEl.textContent = componentList.length;
     versionEl.textContent = response.exactVersion
-      ? `Bootstrap ${response.exactVersion}`
+      ? 'Bootstrap ' + response.exactVersion
       : (VERSION_NAMES[response.version] || 'Unknown');
 
-    if (response.modals.length === 0) {
-      setSelectMessage(selectEl, '-- No modals found --');
-      selectEl.disabled = true;
-      openBtn.disabled = true;
+    if (!componentList.length) {
+      setSelectMessage(selectEl, '-- Nothing found on this page --');
       return;
     }
 
     selectEl.replaceChildren();
 
-    // Add placeholder option
     const placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.textContent = `-- Select a modal (${response.modals.length} found) --`;
+    placeholder.textContent = '-- ' + componentList.length + ' found --';
     selectEl.appendChild(placeholder);
 
-    // Add modal options
-    response.modals.forEach(modal => {
-      const option = document.createElement('option');
-      option.value = modal.id;
-      option.textContent = modal.title ? `#${modal.id} - ${modal.title}` : `#${modal.id}`;
-      selectEl.appendChild(option);
+    // Grouped by kind, so a page with thirty dropdowns and one offcanvas is
+    // still navigable. Groups appear in scan order, which is the order the
+    // registry lists them.
+    const groups = new Map();
+    componentList.forEach((entry, i) => {
+      if (!groups.has(entry.group)) groups.set(entry.group, []);
+      groups.get(entry.group).push({ entry, i });
+    });
+
+    groups.forEach((items, groupName) => {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = groupName + ' (' + items.length + ')';
+      items.forEach(({ entry, i }) => {
+        const option = document.createElement('option');
+        option.value = String(i);
+        option.textContent = describeComponent(entry);
+        optgroup.appendChild(option);
+      });
+      selectEl.appendChild(optgroup);
     });
 
     selectEl.disabled = false;
     openBtn.disabled = false;
   }).catch(err => {
-    setSelectMessage(selectEl, '-- Error loading modals --');
-    countEl.textContent = '-';
-    selectEl.disabled = true;
-    openBtn.disabled = true;
+    componentList = [];
+    if (isNoContentScript(err)) {
+      setSelectMessage(selectEl, '-- Not available on this page --');
+      countEl.textContent = '—';
+      versionEl.textContent = '—';
+      return;
+    }
+    console.error('GridLens: component scan failed', err);
+    throw err;
   });
 }
 

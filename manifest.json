@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "GridLens for Bootstrap",
-  "version": "1.9.1",
-  "description": "Inspect Bootstrap layouts: grid overlay, live breakpoint readout, tooltip viewer, and modal opener.",
+  "version": "1.10.0",
+  "description": "Inspect Bootstrap layouts: grid overlay, live breakpoint readout, tooltip viewer, and a component opener.",
   "minimum_chrome_version": "111",
   "permissions": [
     "activeTab",

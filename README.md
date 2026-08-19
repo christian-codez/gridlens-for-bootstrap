@@ -49,10 +49,24 @@ when the answer changes.
 - Manual version override when detection guesses wrong
 - Works with both jQuery-based and vanilla Bootstrap
 
-### Modal Opener
-- Scans the page and lists every modal it finds
-- Pick one from the dropdown and open it — no trigger button needed
-- Works with Bootstrap 3, 4, and 5
+### Component Opener
+Every Bootstrap JS component extends one base class providing
+`getOrCreateInstance()`, so the whole set is drivable through one code path:
+
+| | |
+|---|---|
+| Modals | opened, closing whatever was open first |
+| Offcanvas | same |
+| Toasts | shown without waiting for whatever triggers them |
+| Dropdowns | opened in place |
+| Tabs & pills | switched to |
+| Collapse & accordions | expanded, named by their own trigger button |
+| Carousels | set cycling |
+| Popovers | shown |
+
+Grouped by kind in the popup, and each is listed whether or not anything on the
+page opens it. Works with Bootstrap 3, 4 and 5 — components that only exist in
+later versions simply do not appear on older pages.
 
 ## Links
 
@@ -106,13 +120,13 @@ Breakpoints* to define your own.
 **Tooltips** — choose a Bootstrap version or leave it on auto-detect, then
 *Show All Tooltips*.
 
-**Modals** — the dropdown lists every modal found on the page. Select one and click
-*Open Selected Modal*. *Refresh Modal List* rescans after the page changes.
+**Components** — the dropdown lists everything found on the page, grouped by kind.
+Select one and click *Open selected*. *Rescan page* picks up anything added since.
 
 ## Try it
 
 `demo/index.html` is a Bootstrap 5 page exercising all three features, including a
-modal with no trigger button. Open it locally and work through the three tabs.
+modal, an offcanvas and a toast with no trigger button anywhere. Open it locally and work through the three tabs.
 
 ## Compatibility
 
@@ -146,7 +160,7 @@ STORE-LISTING.md     Pre-written answers for both store submission forms
 
 ## Version
 
-1.9.1
+1.10.0
 
 ## Icons
 
