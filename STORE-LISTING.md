@@ -370,15 +370,21 @@ should stay at exactly one — a second means something new was introduced.
 Both stores accept the same images. Chrome wants 1280×800 or 640×400; five is the
 maximum and more than one is strongly advised.
 
-Five are built and ready in `store-assets/`, at 2560×1600 (2× of 1280×800):
+Built and ready in `store-assets/`, at the dimensions Chrome documents:
 
-| File | Shows |
-|---|---|
-| `1-grid.png` | Grid overlay on a real `.container`, popup on the Grid tab |
-| `2-tooltips.png` | All five tooltips revealed at once |
-| `3-components.png` | The trigger-less modal opened from the Components tab |
-| `4-fluid.png` | `.container-fluid` overlay |
-| `5-breakpoints.png` | The breakpoints editor, import/export |
+| File | Size | Shows |
+|---|---|---|
+| `1-grid.png` | 1280×800 | Grid overlay on a real `.container`, popup on the Grid tab |
+| `2-tooltips.png` | 1280×800 | All five tooltips revealed at once |
+| `3-components.png` | 1280×800 | The trigger-less modal opened from the Components tab |
+| `4-fluid.png` | 1280×800 | `.container-fluid` overlay |
+| `5-breakpoints.png` | 1280×800 | The breakpoints editor, import/export |
+| `promo-440x280.png` | 440×280 | Small promotional tile |
+
+**Screenshots must be exactly 1280×800 or 640×400.** A 2× render is not accepted,
+so `store-assets/2x/` keeps the high-resolution masters and the files at the top
+level are the ones to upload. **The 440×280 promo tile is required**, not
+optional — the store will not let the listing through without it.
 
 All against `demo/index.html`, never a third party's site — a screenshot
 containing someone else's branding is its own review problem.
