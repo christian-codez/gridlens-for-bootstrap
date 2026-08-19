@@ -23,10 +23,10 @@ is descriptive nominative use rather than a claim of affiliation.
 Inspect Bootstrap layouts: grid overlay, live breakpoint readout, tooltip viewer, and component opener.
 ```
 
-## Summary (Firefox AMO, 250 char max)
+## Summary (Firefox AMO, 250 char max — this is 234)
 
 ```
-A developer tool for working with Bootstrap. Overlay the 12-column grid, watch the active breakpoint change as you resize, reveal every tooltip on the page at once, and open any component without hunting for its trigger. Works with Bootstrap 3, 4 and 5.
+A developer tool for working with Bootstrap. Overlay the 12-column grid, watch the breakpoint change as you resize, reveal every tooltip at once, and open any component without hunting for its trigger. Works with Bootstrap 3, 4 and 5.
 ```
 
 ## Detailed description (both stores)
