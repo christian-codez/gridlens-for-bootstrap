@@ -283,29 +283,31 @@ The previous approach appended a <script src> tag, which any page with a
 restrictive script-src CSP blocked, silently breaking modal opening on a large
 share of real sites. injected.js contains no extension APIs, no network calls,
 and no page-data collection - it only calls show/hide on Bootstrap components
-in response to messages from the popup. This is why strict_min_version is 128.0
-(Firefox's first release supporting manifest-declared MAIN world) and
-minimum_chrome_version is 111.
+in response to messages from the popup. This is why strict_min_version is 128.0:
+that is Firefox's first release supporting a manifest-declared MAIN world.
 
-On the two validator warnings, both of which are intentional:
+On the single validator warning, which is intentional:
 
-  1. MANIFEST_FIELD_UNSUPPORTED - "/background/service_worker" is not supported.
-     Expected. The manifest declares both "service_worker" and "scripts" so one
-     package targets both browsers, per the cross-browser guidance in the MDN
-     background key documentation. Firefox ignores service_worker and runs
-     background.js as an event page; Chrome does the reverse. strict_min_version
-     is 121.0 because earlier Firefox versions would not start the background
-     page when service_worker was also present.
+  UNSAFE_VAR_ASSIGNMENT - innerHTML at content.js:477.
+  The only innerHTML in the extension, and deliberate. Bootstrap's own tooltip
+  renders its title as HTML when the page author opts in with
+  data-bs-html="true" (data-html in Bootstrap 3 and 4). This fallback path
+  reproduces what the page would show on hover, so it must honour the same
+  opt-in or it would misreport the page's actual output. The value is the
+  page's own markup, already under that page's control and already rendered by
+  Bootstrap itself where Bootstrap is present. No extension data, user input or
+  cross-origin content reaches that line, and it runs in the isolated
+  content-script world rather than in any extension page. Without the opt-in
+  the title is assigned as plain text. There is an explanatory comment at that
+  line in the source.
 
-  2. UNSAFE_VAR_ASSIGNMENT - innerHTML at content.js:255.
-     The only innerHTML in the extension, and deliberate. Bootstrap's own tooltip
-     renders its title as HTML when the page author opts in with
-     data-bs-html="true". This fallback path reproduces what the page would show
-     on hover, so it must honour the same opt-in or it would misreport the page's
-     actual output. The value is the page's own markup, already under that page's
-     control, and this runs in the isolated content-script world rather than in
-     any extension page. Without the opt-in the title is assigned as plain text.
-     There is an explanatory comment at that line in the source.
+This package is built for Firefox specifically: it contains background.scripts
+and no service_worker key, so nothing Chrome-only is present. The Chrome build
+is a separate zip from the same source.
+
+The full source is public and unminified at
+https://github.com/christian-codez/gridlens-for-bootstrap - what ships in this
+package is exactly what is in the repository.
 ```
 
 ### Deliberately not done: localisation
@@ -351,8 +353,8 @@ should stay at exactly one — a second means something new was introduced.
 
 # Screenshots
 
-Both stores accept the same images. Chrome wants 1280×800 or 640×400; five is the
-maximum and more than one is strongly advised.
+Chrome requires exactly 1280×800 or 640×400, and at most five. AMO is more
+relaxed about dimensions, so the same five files serve both.
 
 Built and ready in `store-assets/`, all 24-bit RGB with **no alpha channel** —
 the store rejects images that carry one.
@@ -391,25 +393,27 @@ the demo page reports. Each image is those two composited, which is normal for
 store assets. Nothing depicted is behaviour the extension does not have — but
 load the extension and eyeball them side by side before uploading.
 
-1. **Grid overlay active** — overlay on, breakpoint readout visible top-right,
-   popup open on the Grid tab. This is the listing's lead image.
-2. **Breakpoint tracking** — a narrower window showing a different breakpoint, so
-   the responsive behaviour is legible from the thumbnail.
-3. **All tooltips revealed** — the Tooltips tab with all five showing at once,
-   which is the clearest single argument for the feature.
-4. **Modal list** — the Modals tab with the dropdown open, showing detected modals.
-5. **Custom breakpoints** — the expanded editor, showing it is configurable.
+The five, in the order they should appear on a listing:
 
-**Chrome promotional tile** — 440×280. Optional, but required to ever be
-considered for featuring. Worth making once.
+1. **Grid overlay** on a real `.container`, popup on the Grid tab — the lead image.
+2. **All five tooltips** revealed at once, the clearest single argument for that feature.
+3. **The trigger-less modal** opened from the Components tab.
+4. **`.container-fluid`** overlay, showing the container switch.
+5. **The breakpoints editor**, showing it is configurable and shareable.
 
 ---
 
-# Pre-submission blockers still open
+# Where things stand
 
-- [ ] Replace `christian-codez` in all four files
-- [ ] Publish `docs/privacy.html` to GitHub Pages and confirm the URL resolves
-- [ ] Take the five screenshots against `demo/index.html`
-- [ ] Load unpacked in Chrome and confirm no console errors
-- [ ] Load in Firefox via `web-ext run` and confirm settings persist across a reload
-- [ ] Run `npx web-ext lint` and clear all errors
+Chrome Web Store — **submitted**, awaiting review.
+
+Firefox AMO — ready to submit:
+
+- [x] `dist/gridlens-for-bootstrap-v1.10.0-firefox.zip` built and linted: 0 errors, 1 documented warning
+- [x] Privacy policy, support and demo pages live over HTTPS
+- [x] Screenshots and icons prepared
+- [ ] Sign in at the Add-ons Developer Hub — free, no fee
+- [ ] Upload the **firefox** zip, not the chrome one
+- [ ] Answer "no" to the source-code upload question
+- [ ] Paste the reviewer notes above — AMO has a notes box, Chrome does not
+- [ ] Select MIT as the license
