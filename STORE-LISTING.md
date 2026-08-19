@@ -334,6 +334,15 @@ notices    0
 warnings   1   (explained in the reviewer notes above)
 ```
 
+Since 3 November 2025 AMO requires every new extension to declare
+`browser_specific_settings.gecko.data_collection_permissions`. GridLens has no
+server and transmits nothing, so it declares the explicit `"required": ["none"]`.
+Omitting the key is a hard validation error on upload, not a warning.
+
+`package.sh` is pinned to web-ext 8.10.0 for this reason: 8.9.0 reported nothing
+about the missing key, so the local check was passing a package the server
+refused. Do not move that pin backwards.
+
 `package.sh` builds a separate zip per browser and lints the Firefox payload —
 so this validates exactly what AMO receives, not the working tree. Linting the
 working tree instead reports spurious warnings for `package.sh` itself and for

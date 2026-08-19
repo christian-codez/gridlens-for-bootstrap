@@ -130,7 +130,12 @@ echo "linting the Firefox payload (this is what AMO receives)…"
 echo
 # Expect: 0 errors, 0 notices, 1 warning - the single deliberate innerHTML that
 # mirrors Bootstrap's own data-bs-html behaviour, explained in STORE-LISTING.md.
-# A second warning means something new was introduced; investigate before upload.
-npx --yes web-ext@8.9.0 lint --source-dir dist/pkg-firefox 2>&1 \
+# Anything beyond that means something new was introduced; investigate first.
+#
+# Pinned to 8.10.0 rather than 8.9.0: AMO rejected an upload for a missing
+# data_collection_permissions key that 8.9.0 reported nothing about, so the
+# local check was passing packages the server refused. 8.10.0 flags it.
+# Do not move this back without checking the newer version still catches it.
+npx --yes web-ext@8.10.0 lint --source-dir dist/pkg-firefox 2>&1 \
   | grep -v "EBADENGINE\|npm WARN" \
   | grep -A5 "Validation Summary" || true

@@ -4,7 +4,9 @@
     "Firefox has no background service worker support and needs background.scripts;",
     "Chrome warns that background.scripts requires manifest v2 or lower. Shipping one",
     "manifest to both therefore always warns somewhere, so each browser gets its own.",
-    "Keys set to null here are removed from the Firefox manifest."
+    "Keys set to null here are removed from the Firefox manifest.",
+    "data_collection_permissions has been required by AMO since 2025-11-03; once an",
+    "extension starts declaring it, every later version must keep declaring it."
   ],
   "background": {
     "scripts": [
@@ -14,7 +16,12 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "gridlens@christian-codez.github.io",
-      "strict_min_version": "128.0"
+      "strict_min_version": "128.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
     }
   },
   "minimum_chrome_version": null
