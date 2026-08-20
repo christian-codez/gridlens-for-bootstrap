@@ -242,6 +242,45 @@ having a reviewer reproduce your artifact.
 
 MIT — see `LICENSE` in the repository root.
 
+### Version notes
+
+AMO asks for these separately from the description, and they are shown publicly
+as the release notes for this version.
+
+```
+First public release.
+
+GRID OVERLAY
+Reproduces Bootstrap's real container geometry - the correct max-width and
+gutter for each breakpoint, matched to whichever major version the page uses -
+so it lines up with your actual columns rather than approximating them. Switch
+between .container and .container-fluid. Any overlay colour.
+
+BREAKPOINT READOUT
+On the page and on the toolbar icon, updating live as you resize. Appears only
+on pages that actually use Bootstrap.
+
+TOOLTIP VIEWER
+Reveals every Bootstrap tooltip at once instead of hovering each element in turn.
+
+COMPONENT OPENER
+Modals, offcanvas panels, toasts, dropdowns, tabs, accordions, carousels and
+popovers - including any with no trigger anywhere on the page.
+
+CUSTOM BREAKPOINTS
+Override Bootstrap's defaults, with JSON import and export for sharing a set
+across a team.
+
+Works with Bootstrap 3, 4 and 5. No analytics, no telemetry, no accounts, no
+servers, no network activity of any kind.
+```
+
+### Test account
+
+Not applicable. The extension needs no account, no sign-in and no configuration.
+It works on any page that uses Bootstrap; there is a demo page linked in the
+reviewer notes below.
+
 ### Notes to reviewer
 
 ```
