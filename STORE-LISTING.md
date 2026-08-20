@@ -543,15 +543,41 @@ The five, in the order they should appear on a listing:
 
 # Where things stand
 
-Chrome Web Store — **submitted**, awaiting review.
+Both stores: **submitted, awaiting review** — v1.10.0.
 
-Firefox AMO — ready to submit:
+| | Submitted | Notes |
+|---|---|---|
+| Chrome Web Store | v1.10.0 | Flagged for in-depth review because of `<all_urls>`. Expected. |
+| Firefox AMO | v1.10.0 | Manual review for the same reason; AMO reviewers read source. |
 
-- [x] `dist/gridlens-for-bootstrap-v1.10.0-firefox.zip` built and linted: 0 errors, 1 documented warning
-- [x] Privacy policy, support and demo pages live over HTTPS
-- [x] Screenshots and icons prepared
-- [ ] Sign in at the Add-ons Developer Hub — free, no fee
-- [ ] Upload the **firefox** zip, not the chrome one
-- [ ] Answer "no" to the source-code upload question
-- [ ] Paste the reviewer notes above — AMO has a notes box, Chrome does not
-- [ ] Select MIT as the license
+## While waiting
+
+Nothing to do. Both queues are slower for a first submission requesting broad
+host access, and days rather than hours is normal.
+
+## If either comes back with questions
+
+Answer in the same channel they ask. Most queries about this extension are
+already answered in writing:
+
+- *Why all sites?* — the host permission justification.
+- *What is `world: "MAIN"` for?* — the reviewer notes, and the comment at the top
+  of `injected.js`.
+- *Why an `innerHTML`?* — the reviewer notes, and the comment at `content.js:477`.
+
+## If either requires a change
+
+**Bump the version before re-uploading.** AMO refuses a version number it has
+already seen, and Chrome treats each upload as a new package. `./package.sh`
+reads the version from `manifest.json`, so changing it there is enough.
+
+The two stores track versions independently, so they are free to diverge — fixing
+something for one does not require re-submitting to the other.
+
+## Once approved
+
+- Link both listings from the homepage at `docs/index.html`, which currently says
+  the extension is not yet published.
+- The README install section says the same and should point at the stores.
+- Consider a `v1.10.0` git tag to mark what was submitted.
+
