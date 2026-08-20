@@ -11,7 +11,7 @@ any kind. Nothing the extension sees ever leaves your browser.
 ## What the extension can access
 
 GridLens runs on the pages you visit in order to do its job — drawing a grid overlay,
-finding tooltip elements, and listing Bootstrap modals requires reading the structure
+finding tooltip elements, and listing Bootstrap components requires reading the structure
 of the page in front of you.
 
 This reading happens entirely inside your browser, in memory, while the page is open.
