@@ -375,70 +375,68 @@ to describe what the tool inspects.
 
 ### Notes to reviewer
 
+**AMO caps this field at 3000 characters** — the first draft was over and was
+rejected on save. This is 2565, leaving room to add to it later without
+having to cut something else out.
+
+Chrome has no equivalent field, so this is Firefox-only. With `<all_urls>` the
+add-on gets a human reviewer who reads source, which makes this the
+highest-leverage box on the form.
+
 ```
-GridLens is a Bootstrap layout inspector with no network activity of any kind.
+GridLens is a Bootstrap layout inspector. No network activity of any kind: no
+analytics, no telemetry, no remote code, no server.
 
-Testing it needs a page that actually uses Bootstrap. There is one covering every
-feature at
+TESTING
 
-  https://christian-codez.github.io/gridlens-for-bootstrap/demo/
+A demo page covering every feature:
+https://christian-codez.github.io/gridlens-for-bootstrap/demo/
 
-Please use that URL rather than opening demo/index.html from disk: extensions do
-not run on file:// URLs unless "Allow access to file URLs" is switched on for
-the extension, so a local copy will appear to do nothing until it is.
+Please use that URL rather than a local copy. Extensions do not run on file://
+unless "Allow access to file URLs" is enabled for them, so a local file will
+appear to do nothing.
 
-With the demo open:
+1. Grid tab - "Show Grid" draws the 12-column overlay; it should sit exactly on
+   the demo page's real columns. Resize and the breakpoint readout tracks it.
+   "Container Type" switches to .container-fluid.
+2. Tooltips tab - "Show All Tooltips" reveals all five at once, and the readout
+   shows the exact Bootstrap version the page loaded.
+3. Components tab - lists twelve components grouped by kind. Any one opens,
+   including the modal, offcanvas and toast that nothing on the page triggers.
 
-  1. Grid tab      -> "Show Grid" draws the 12-column overlay; it should sit
-                      exactly on the demo page's real columns. Resize and the
-                      breakpoint readout and container tier both track it.
-                      "Container Type" switches to .container-fluid.
-  2. Tooltips tab  -> "Show All Tooltips" reveals all five tooltips at once.
-                      The version readout should show the exact Bootstrap
-                      version the demo page loads.
-  3. Components tab -> the dropdown lists twelve components grouped by kind.
-                      Picking any one opens it, including the modal, offcanvas
-                      and toast that nothing on the page triggers.
+PERMISSIONS
 
-On permissions: the content script matches <all_urls> because a developer using
-this tool may be working on any origin — localhost, staging, a client's domain.
-It reads page structure to draw the overlay and find Bootstrap components, and
-does nothing else with it. There is no analytics, no telemetry, no remote code,
-and no server. Settings are four values in storage.sync, plus per-tab grid visibility in
-session storage, and nothing more.
+<all_urls> because a developer using this may be working on any origin:
+localhost, a staging server, a client's domain. The content script reads page
+structure to draw the overlay and locate Bootstrap components, and does nothing
+else with it. Storage is four preferences in storage.sync plus per-tab grid
+visibility in session storage.
 
-On the MAIN-world content script: injected.js is declared with "world": "MAIN"
-because reaching Bootstrap's own instance APIs (bootstrap.Modal.getInstance,
-jQuery plugin methods) requires running in the page's execution environment.
-The previous approach appended a <script src> tag, which any page with a
-restrictive script-src CSP blocked, silently breaking modal opening on a large
-share of real sites. injected.js contains no extension APIs, no network calls,
-and no page-data collection - it only calls show/hide on Bootstrap components
-in response to messages from the popup. This is why strict_min_version is 128.0:
-that is Firefox's first release supporting a manifest-declared MAIN world.
+MAIN-WORLD CONTENT SCRIPT
 
-On the single validator warning, which is intentional:
+injected.js is declared with "world": "MAIN" because reaching Bootstrap's own
+instance APIs (bootstrap.Modal.getInstance, jQuery plugin methods) requires the
+page's execution environment. It contains no extension APIs, no network calls
+and no data collection - it calls show/hide on Bootstrap components in response
+to messages from the popup. This is why strict_min_version is 128.0: Firefox's
+first release supporting a manifest-declared MAIN world.
 
-  UNSAFE_VAR_ASSIGNMENT - innerHTML at content.js:477.
-  The only innerHTML in the extension, and deliberate. Bootstrap's own tooltip
-  renders its title as HTML when the page author opts in with
-  data-bs-html="true" (data-html in Bootstrap 3 and 4). This fallback path
-  reproduces what the page would show on hover, so it must honour the same
-  opt-in or it would misreport the page's actual output. The value is the
-  page's own markup, already under that page's control and already rendered by
-  Bootstrap itself where Bootstrap is present. No extension data, user input or
-  cross-origin content reaches that line, and it runs in the isolated
-  content-script world rather than in any extension page. Without the opt-in
-  the title is assigned as plain text. There is an explanatory comment at that
-  line in the source.
+VALIDATOR WARNING
 
-This package is built for Firefox specifically: it contains background.scripts
-and no service_worker key, so nothing Chrome-only is present. The Chrome build
-is a separate zip from the same source.
+UNSAFE_VAR_ASSIGNMENT, innerHTML at content.js:477. The only innerHTML in the
+extension, and deliberate. Bootstrap's own tooltip renders its title as HTML
+when the page author opts in with data-bs-html="true", so this fallback path
+must honour the same opt-in or it would misreport what the page actually shows.
+The value is the page's own markup, already under that page's control, and it
+runs in the isolated content-script world rather than in any extension page.
+Without the opt-in the title is assigned as plain text. There is an explanatory
+comment at that line in the source.
 
-The full source is public and unminified at
-https://github.com/christian-codez/gridlens-for-bootstrap - what ships in this
-package is exactly what is in the repository.
+SOURCE
+
+Public and unminified at https://github.com/christian-codez/gridlens-for-bootstrap
+What ships in this package is exactly what is in the repository; nothing is
+bundled, minified or generated by a build step.
 ```
 
 ### Deliberately not done: localisation
